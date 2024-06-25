@@ -1,0 +1,16 @@
+{% extends"layout.html" %}
+{% block content %}
+<html>
+<head>
+    <title>Cards</title>
+</head>
+<body>
+    <h1>All Cards</h1>
+    <ul>
+        {% for card in cards %}
+            <a href="{{ url_for('card', id=card.id) }}">{{ card.name }}</a>     
+        {% endfor %}
+    </ul>
+</body>
+</html>
+{%endblock%}

@@ -1,0 +1,15 @@
+{% extends"layout.html" %}
+{% block content %}
+<html>
+<head>
+    <title>{{ card.name }}</title>
+</head>
+<body>
+    <h1>{{ card.name }}</h1>
+    <p>{{ card.description }}</p>
+    <p>Rarity: {{ card.rarity_type.type }}</p>
+    <p>Attack Type: {{ card.attack.type }} -- {{ card.attack.description }}</p>
+    <a href="{{ url_for('cards') }}">Back to all cards</a>
+</body>
+</html>
+{%endblock%}

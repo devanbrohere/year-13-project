@@ -1,0 +1,46 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>octagon menu</title>
+    <link rel="stylesheet"href="style.css">
+</head>
+<body>
+  <ul class="menu">
+    <div  class="menuToggle"><ion-icon name="add-outline"></ion-icon></div>
+    <li style="--i:0;--clr:#ff2972;">
+        <a href="/"><ion-icon name="home-outline"></ion-icon></a>
+    </li>
+    <li style="--i:1;--clr:#fee800;">
+        <a href ="#"><ion-icon name="mail-sharp"></ion-icon></a>
+    </li>
+    <li style="--i:2;--clr:#04fc43;">
+        <a href="#"><ion-icon name="information-circle-sharp"></ion-icon></a>
+    </li>
+    <li style="--i:3;--clr:#fe00f1;">
+        <a href="/login_signup"><ion-icon name="person-circle-sharp"></ion-icon></a>
+    </li>
+    <li style="--i:4;--clr:#00b0fe;">
+        <a href="/cards"></a>
+    </li>
+    <li style="--i:5;--clr:#fea600;">
+        <a href=""></a>
+    </li>
+    <li style="--i:6;--clr:#a529ff;">
+        <a href=""></a>
+    </li>
+    <li style="--i:7;--clr:#01bdab;">
+        <a href=""></a>
+    </li>
+  </ul>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+  <script>
+    let menuToggle = document.querySelector('.menuToggle');
+    let menu = document.querySelector('.menu');
+    menuToggle.onclick = function(){
+        menu.classList.toggle('active');
+    }
+  </script>
+</body>
+</html>

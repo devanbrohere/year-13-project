@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title img src="">website name</title>
+        
+        <link rel="stylesheet" href="/static/css/style.css">
+        
+    </head>
+    <body class="{{pagename}}">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+        <nav>
+            {% include "nav.html" %}
+        </nav>
+        <main>
+            <hr>
+            {% block content %}{% endblock %}
+        </main>
+        <footer class="footer">
+            {% include "footer.html" %}
+        </footer>
+    </body>
+</html>
