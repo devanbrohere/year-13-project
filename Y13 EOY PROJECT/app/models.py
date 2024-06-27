@@ -13,6 +13,10 @@ class Cards(db.Model):
     Trophies = db.relationship("Trophies", backref="Trophies")
     evolution = db.Column(db.Integer, db.ForeignKey("Evolution.id"))
     evo = db.relationship("Evolution", backref="Evolution")
+    speed = db.Column(db.Text())
+    spawn_time = db.Column(db.Text())
+    elixir = db.Column(db.Text())
+    image = db.Column(db.Text())
 
 
 class Rarity(db.Model):

@@ -1,16 +1,17 @@
-{% extends"layout.html" %}
+{% extends "layout.html" %}
 {% block content %}
-<html>
-<head>
-    <title>Cards</title>
-</head>
-<body>
     <h1>All Cards</h1>
-    <ul>
-        {% for card in cards %}
-            <a href="{{ url_for('card', id=card.id) }}">{{ card.name }}</a>     
-        {% endfor %}
-    </ul>
-</body>
-</html>
-{%endblock%}
+    <div class="horizontal-list-container">    
+        <ul class = "horizontal-list">
+            {% for card in cards %}
+            
+                <a href="{{ url_for('card', id=card.id) }}">
+                    <div class="image">
+                        <img src="{{ url_for('static', filename=card.image) }}"width="100" height="100">
+                    </div>
+                </a>
+            
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

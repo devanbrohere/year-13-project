@@ -387,3 +387,23 @@ display: none;
     transform: translateY(0px); }
   to {
     transform: translateY(-2000px); } }
+
+
+.horizontal-list-container {
+  max-width: 800px;   /* Adjust the maximum width as needed */
+  margin: 0 auto;     /* Center the container */
+  overflow: hidden;   /* Ensure no overflow */
+  }
+  
+.horizontal-list {
+  list-style-type: none; /* Remove default list bullets */
+  padding: 0;            /* Remove default padding */
+  margin: 0;             /* Remove default margin */
+  display: flex;         /* Use flexbox to align items horizontally */
+  flex-wrap: wrap;       /* Allow items to wrap to the next line */
+  }
+  
+.horizontal-list li {
+  margin-right: 20px;    /* Add space between items */
+  margin-bottom: 10px;   /* Add space between rows if wrapping occurs */
+  }
