@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, abort
+from flask import render_template, abort, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 
@@ -9,7 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, "cl
 db.init_app(app)
 
 import app.models as models
-
+from app.forms import Add_Card
 
 @app.route("/")
 def home():
@@ -20,6 +20,13 @@ def home():
 @app.route("/about")
 def about():
     return render_template("about.html")
+
+
+@app.route("/add_card", methods=['GET','POST'])
+def add_card():
+    form = Add_Card()
+    if request.method=="GET":
+        return render_template
 
 
 @app.route('/login_signup')

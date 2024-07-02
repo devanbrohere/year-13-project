@@ -407,3 +407,13 @@ display: none;
   margin-right: 20px;    /* Add space between items */
   margin-bottom: 10px;   /* Add space between rows if wrapping occurs */
   }
+
+
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
+}
+
