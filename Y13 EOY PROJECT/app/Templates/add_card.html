@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Add Cards</h2>
+
+<form method="POST" enctype="multipart/form-data">
+  {{ form.csrf_token }}
+  <p>card: {{ form.name }} <span style="color:red">{{ form.name.errors }}</span></p>
+  <p>rarity: {{ form.rarity }} <span style="color:red">{{ form.rarity.errors }}</span></p>
+  <input type="submit" value="Add this movie">
+</form> 
+
+{% endblock %}

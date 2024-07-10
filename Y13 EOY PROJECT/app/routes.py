@@ -1,12 +1,18 @@
 from app import app
-from flask import render_template, abort, request
+from flask import render_template, abort, request, redirect, url_for
+from flask_login import login_user, logout_user, current_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, "clash.db")
-db.init_app(app)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'correcthorsebatterystaple'
+WTF_CSRF_ENABLED = True
+WTF_CSRF_SECRET_KEY = 'sup3r_secr3t_passw3rd'
+db = SQLAlchemy(app)
+
 
 import app.models as models
 from app.forms import Add_Card
@@ -22,44 +28,78 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/add_card", methods=['GET','POST'])
+@app.route("/add_card", methods=['GET', 'POST'])
 def add_card():
     form = Add_Card()
-    if request.method=="GET":
-        return render_template
+    rarity = models.Rarity.query.all()
+    form.rarity.choices = [(rarity.id, rarity.type) for rarity in rarity]
+    target = models.Targets.query.all()
+    form.target.choices = [(target.id, target.type) for target in target]
+    trophies = models.Trophies.query.all()
+    form.trophy.choices = [(trophy.id, trophy.type) for trophy in trophies]
+    evolution = models.Evolution.query.all()
+    form.evolution.choices = [(evolution.id, evolution.cycles) for evolution in evolution]
+    if request.method == "GET":
+        return render_template("add_card.html", form=form, title="Add A Card")
+    else:
+        if form.validate_on_submit():
+            new_card = models.Cards()
+            new_card.name = form.card.data
+            new_card.rarity = form.rarity.data
+            db.session.add(new_card)
+            return redirect(url_for('details', ref=new_card.id))
+        else:
+            return render_template('add_card.html', form=form, title="add_card")
 
 
+@app.route('/details/<int:ref>')
+def details(ref):
+    deets = models.Cards.query.filter_by(id=ref).first_or_404()
+    return render_template("card_deets.html", cards=deets, title=deets.name)
+
+
+# Route to render the login and signup page
 @app.route('/login_signup')
 def login_signup():
     return render_template("login_signup.html")
+
 
 
 @app.route('/login', methods=['POST'])
 def login():
     email = request.form['email']
     password = request.form['password']
-    conn = database()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM users WHERE email = ? AND password = ?', (email, password))
-    user = cursor.fetchone()
-    conn.close()
+    user = models.User.query.filter_by(email=email, password=password).first()
     if user:
-        return f"Welcome, {user['full_name']}!"
+        login_user(user)
+        return redirect(url_for('welcome'))
     else:
+        # If the user is not found, return an error message
         return "Invalid email or password"
 
-
-# Route for the sign-up page
+# Route to handle signup form submission
 @app.route('/signup', methods=['POST'])
 def signup():
+    # Get full name, email, and password from the form
     full_name = request.form['full_name']
     email = request.form['email']
     password = request.form['password']
-    conn = database()
-    cursor = conn.cursor()
-    cursor.execute('INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)', (full_name, email, password))
-    conn.commit()
-    conn.close()
+    new_user = User(full_name=full_name, email=email, password=password)
+    db.session.add(new_user)
+    db.session.commit()
+    return redirect(url_for('login_signup'))
+
+
+@app.route('/welcome')
+@login_required
+def welcome():
+    return f"Welcome, {current_user.full_name}!"
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
     return redirect(url_for('login_signup'))
 
 
@@ -68,10 +108,12 @@ def cards():
     cards = models.Cards.query.all()
     return render_template('cards.html', cards=cards)
 
+
 @app.route('/card/<int:id>')
 def card(id):
     card = models.Cards.query.filter_by(id=id).first()
     return render_template('card.html', card=card)
+
 
 if __name__ == "__main__":  # type:ignore
     app.run(debug=True)
