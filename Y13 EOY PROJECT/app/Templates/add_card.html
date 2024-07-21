@@ -1,12 +1,106 @@
-{% extends 'layout.html' %}
-{% block content %}
-<h2>Add Cards</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ title }}</h1>
+        <form method="post" action="{{ url_for('add_card') }}">
+            {{ form.hidden_tag() }}
 
-<form method="POST" enctype="multipart/form-data">
-  {{ form.csrf_token }}
-  <p>card: {{ form.name }} <span style="color:red">{{ form.name.errors }}</span></p>
-  <p>rarity: {{ form.rarity }} <span style="color:red">{{ form.rarity.errors }}</span></p>
-  <input type="submit" value="Add this movie">
-</form> 
+            <div class="form-group">
+                <label for="name">{{ form.name.label }}</label>
+                {{ form.name(size=20, class_='form-control') }}
+                {% for error in form.name.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
 
-{% endblock %}
+            <div class="form-group">
+                <label for="rarity">{{ form.rarity.label }}</label>
+                {{ form.rarity(class_='form-control') }}
+                {% for error in form.rarity.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="target">{{ form.target.label }}</label>
+                {{ form.target(class_='form-control') }}
+                {% for error in form.target.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="pro_con">{{ form.pro_con.label }}</label>
+                {{ form.pro_con(size=20, class_='form-control') }}
+                {% for error in form.pro_con.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="trophies">{{ form.trophies.label }}</label>
+                {{ form.trophies(class_='form-control') }}
+                {% for error in form.trophies.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="evolution">{{ form.evolution.label }}</label>
+                {{ form.evolution(class_='form-control') }}
+                {% for error in form.evolution.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="speed">{{ form.speed.label }}</label>
+                {{ form.speed(class_='form-control') }}
+                {% for error in form.speed.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="spawn_time">{{ form.spawn_time.label }}</label>
+                {{ form.spawn_time(class_='form-control') }}
+                {% for error in form.spawn_time.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="elixir">{{ form.elixir.label }}</label>
+                {{ form.elixir(class_='form-control') }}
+                {% for error in form.elixir.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="description">{{ form.description.label }}</label>
+                {{ form.description(class_='form-control') }}
+                {% for error in form.description.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="image">{{ form.image.label }}</label>
+                {{ form.image(class_='form-control') }}
+                {% for error in form.image.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Card</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -30,26 +30,46 @@ def about():
 
 @app.route("/add_card", methods=['GET', 'POST'])
 def add_card():
-    form = Add_Card()
-    rarity = models.Rarity.query.all()
-    form.rarity.choices = [(rarity.id, rarity.type) for rarity in rarity]
-    target = models.Targets.query.all()
-    form.target.choices = [(target.id, target.type) for target in target]
+    rarities = models.Rarity.query.all()
+    rarity_choices = [(rarity.id, rarity.type) for rarity in rarities]
+    targets = models.Targets.query.all()
+    target_choices = [(target.id, target.type) for target in targets]
     trophies = models.Trophies.query.all()
-    form.trophy.choices = [(trophy.id, trophy.type) for trophy in trophies]
-    evolution = models.Evolution.query.all()
-    form.evolution.choices = [(evolution.id, evolution.cycles) for evolution in evolution]
+    trophy_choices = [(trophy.id, trophy.type) for trophy in trophies]
+    evolutions = models.Evolution.query.all()
+    evolution_choices = [(evolution.id, evolution.cycles) for evolution in evolutions]
+
+    form = Add_Card(
+        rarity_choices=rarity_choices,
+        target_choices=target_choices,
+        trophy_choices=trophy_choices,
+        evolution_choices=evolution_choices
+    )
+
     if request.method == "GET":
         return render_template("add_card.html", form=form, title="Add A Card")
     else:
         if form.validate_on_submit():
             new_card = models.Cards()
-            new_card.name = form.card.data
+            new_card.name = form.name.data
             new_card.rarity = form.rarity.data
+            new_card.target = form.target.data
+            new_card.pro_con = form.pro_con.data
+            new_card.trophies = form.trophies.data
+            new_card.evolution = form.evolution.data
+            new_card.speed = form.speed.data
+            new_card.spawn_time = form.spawn_time.data
+            new_card.elixir = form.elixir.data
+            new_card.description = form.description.data
+            new_card.image = form.image.data
+
             db.session.add(new_card)
+            db.session.commit()  # Don't forget to commit the session
             return redirect(url_for('details', ref=new_card.id))
         else:
-            return render_template('add_card.html', form=form, title="add_card")
+            return render_template('add_card.html', form=form, title="Add A Card")
+
+
 
 
 @app.route('/details/<int:ref>')
