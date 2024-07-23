@@ -35,7 +35,7 @@ def add_card():
     targets = models.Targets.query.all()
     target_choices = [(target.id, target.type) for target in targets]
     trophies = models.Trophies.query.all()
-    trophy_choices = [(trophy.id, trophy.type) for trophy in trophies]
+    trophy_choices = [(trophy.id, trophy.trophies) for trophy in trophies]
     evolutions = models.Evolution.query.all()
     evolution_choices = [(evolution.id, evolution.cycles) for evolution in evolutions]
 

@@ -30,9 +30,9 @@ class Rarity(db.Model):
 class Evolution(db.Model):
     __tablename__ = "Evolution"
     id = db.Column(db.Integer, primary_key=True)
-    cycles = db.Column(db.Text())
-    stat_boost = db.Column(db.Text())
-    special_ablity = db.Column(db.Text())
+    cycles = db.Column(db.String(50), nullable=False)
+    stat_boost = db.Column(db.String(50), nullable=False)
+    special_ability = db.Column(db.String(50), nullable=False)
 
 
 class Targets(db.Model):
