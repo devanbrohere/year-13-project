@@ -2,6 +2,7 @@ from app import app
 from flask import render_template, abort, request, redirect, url_for
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -30,23 +31,15 @@ def about():
 
 @app.route("/add_card", methods=['GET', 'POST'])
 def add_card():
-    rarities = models.Rarity.query.all()
-    rarity_choices = [(rarity.id, rarity.type) for rarity in rarities]
-    targets = models.Targets.query.all()
-    target_choices = [(target.id, target.type) for target in targets]
-    trophies = models.Trophies.query.all()
-    trophy_choices = [(trophy.id, trophy.trophies) for trophy in trophies]
-    evolutions = models.Evolution.query.all()
-    evolution_choices = [(evolution.id, evolution.cycles) for evolution in evolutions]
-
     form = Add_Card(
-        rarity_choices=rarity_choices,
-        target_choices=target_choices,
-        trophy_choices=trophy_choices,
-        evolution_choices=evolution_choices
+        # rarity_choices=rarity_choices,
+        # target_choices=target_choices,
+        # trophy_choices=trophy_choices,
+        # evolution_choices=evolution_choices
     )
 
     if request.method == "GET":
+
         return render_template("add_card.html", form=form, title="Add A Card")
     else:
         if form.validate_on_submit():
@@ -54,21 +47,31 @@ def add_card():
             new_card.name = form.name.data
             new_card.rarity = form.rarity.data
             new_card.target = form.target.data
-            new_card.pro_con = form.pro_con.data
-            new_card.trophies = form.trophies.data
+            new_card.Min_trophies_unlocked = form.trophies.data
             new_card.evolution = form.evolution.data
             new_card.speed = form.speed.data
+            new_card.specials = form.special.data
             new_card.spawn_time = form.spawn_time.data
             new_card.elixir = form.elixir.data
             new_card.description = form.description.data
-            new_card.image = form.image.data
+
+            # Handle file upload
+            filenames = []
+            for image in [form.image]:
+                if image.data:
+                    filename = secure_filename(image.data.filename)
+                    image.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    filenames.append(filename)
+                else:
+                    filenames.append(None)
+            new_card.image = filenames[0]
 
             db.session.add(new_card)
-            db.session.commit()  # Don't forget to commit the session
+            db.session.commit()
+
             return redirect(url_for('details', ref=new_card.id))
         else:
             return render_template('add_card.html', form=form, title="Add A Card")
-
 
 
 
@@ -104,7 +107,7 @@ def signup():
     full_name = request.form['full_name']
     email = request.form['email']
     password = request.form['password']
-    new_user = User(full_name=full_name, email=email, password=password)
+    new_user = models.User(full_name=full_name, email=email, password=password)
     db.session.add(new_user)
     db.session.commit()
     return redirect(url_for('login_signup'))

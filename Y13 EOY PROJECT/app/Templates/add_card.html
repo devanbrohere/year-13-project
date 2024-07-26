@@ -6,13 +6,7 @@
     <form method="post" action="{{ url_for('add_card') }}">
         {{ form.hidden_tag() }}
 
-        <div class="form-group">
-            <label for="name">{{ form.name.label }}</label>
-            {{ form.name(size=20, class_='form-control') }}
-            {% for error in form.name.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
-        </div>
+        <p>Title: {{ form.name }} <span style="color:red">{{ form.name.errors }}</span></p>
 
         <div class="form-group">
             <label for="rarity">{{ form.rarity.label }}</label>
@@ -31,20 +25,20 @@
         </div>
 
         <div class="form-group">
-            <label for="pro_con">{{ form.pro_con.label }}</label>
-            {{ form.pro_con(size=20, class_='form-control') }}
-            {% for error in form.pro_con.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
-        </div>
-
-        <div class="form-group">
             <label for="trophies">{{ form.trophies.label }}</label>
             {{ form.trophies(class_='form-control') }}
             {% for error in form.trophies.errors %}
                 <span class="text-danger">{{ error }}</span>
             {% endfor %}
         </div>
+
+        <div class="form-group">
+          <label for="specials">{{ form.specials.label }}</label>
+          {{ form.specials(class_='form-control') }}
+          {% for error in form.specials.errors %}
+              <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+      </div>
 
         <div class="form-group">
             <label for="evolution">{{ form.evolution.label }}</label>

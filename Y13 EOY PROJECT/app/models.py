@@ -15,10 +15,20 @@ class Cards(db.Model):
     Trophies = db.relationship("Trophies", backref="Trophies")
     evolution = db.Column(db.Integer, db.ForeignKey("Evolution.id"))
     evo = db.relationship("Evolution", backref="Evolution")
+    Special = db.Column(db.Integer, db.ForeignKey("Special.id"))
+    special = db.relationship("Special", backref="Special")
     speed = db.Column(db.Text())
     spawn_time = db.Column(db.Text())
     elixir = db.Column(db.Text())
     image = db.Column(db.Text())
+
+
+class Special(db.Model):
+    __tablename__ = "Special"
+    id = db.Column(db.Integer, primary_key=True)
+    special = db.Column(db.Text())
+    activation_elixir = db.Column(db.Text())
+    description = db.Column(db.Text())
 
 
 class Rarity(db.Model):
@@ -48,9 +58,13 @@ class Trophies(db.Model):
     arena = db.Column(db.Text())
 
 
-class User(db.Model, UserMixin):
-    __tablename__ = 'Users'
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
+    full_name = db.Column(db.String(150))
+    email = db.Column(db.String(150), unique=True)
+    password = db.Column(db.String(150))
+
+
+class Card_stats(db.Model):
+    __tablename__ = "Card_stats"
+    id = db.Column(db.Integer, primary_key=True)    
