@@ -144,7 +144,7 @@ box-shadow: 0 0 10px var(--clr),
   position:absolute;
   width:60px;
   height: 60px;
-  color: blue;
+  color: rgb(251, 0, 255);
   display:flex;
   justify-content: center;
   align-items: center;
@@ -163,7 +163,7 @@ a:hover {
 	text-decoration: none;
 }
 .link {
-  color: #1bf10c;
+  color: #f1770c;
 }
 .link:hover {
   color: #0810ef;
@@ -174,12 +174,12 @@ p {
 }
 h4 {
   font-weight: 600;
-  color:red;
+  color:rgb(247, 25, 9);
 }
 h6 span{
   padding: 0 20px;
   font-weight: 700;
-  color:#f50404
+  color:#f9fcf9
 }
 .section{
   position: relative;
@@ -251,8 +251,8 @@ display: none;
   height: 100%;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-  background-color: #0031d3;
-  background-image: url('/img/pattern_japanese-pattern-2_1_2_0-0_0_1__ffffff00_000000.png');
+  background-color: #d10d0d;
+  background-image: url('/static/images/login.png');
   position: absolute;
   border-radius: 6px;
 }
@@ -290,17 +290,17 @@ display: none;
   letter-spacing: 0.5px;
   outline: none;
   color: #00ff11;
-  background-color: #091470;
+  background-color: #194c68;
   border: none;
   -webkit-transition: all 200ms linear;
   transition: all 200ms linear;
-  box-shadow: 0 4px 8px 0 rgba(21,21,21,.2);
+  box-shadow: 0 4px 8px 0 rgba(247, 3, 3, 0.955);
 }
 .form-style:focus,
 .form-style:active {
   border: none;
   outline: none;
-  box-shadow: 0 4px 8px 0 rgba(248, 0, 0, 0.2);
+  box-shadow: 0 4px 8px 0 rgba(58, 248, 0, 0.93);
 }
 .input-icon {
   position: absolute;
@@ -327,15 +327,14 @@ display: none;
   display: -ms-inline-flexbox;
   display: inline-flex;
   align-items: center;
-  background-color: #ffeba7;
-  color: #f50404;
+  background-color: #f7c41c;
+  color: #000000;
 }
 .btn:hover{  
   background-color: #000000;
   color: #ffeba7;
   box-shadow: 0 8px 24px 0 rgba(16,39,112,.2);
 }
-
 #stars {
   width: 1px;
   height: 1px;

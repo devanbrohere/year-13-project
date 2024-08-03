@@ -1,5 +1,17 @@
 from app.routes import db
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
+Card_stats = db.Table('card_stats',
+    db.Column('card_id', db.Integer, db.ForeignKey('Card.id'), primary_key=True),
+    db.Column('health_id', db.Integer, db.ForeignKey('Health.id'), primary_key=True),
+    db.Column('level_id', db.Integer, db.ForeignKey('Level.id'), primary_key=True),
+    db.Column('damage', db.Integer, db.ForeignKey('Damage.id'), primary_key=True),
+    db.Column('damage_per_sec_id', db.Integer, db.ForeignKey('Damage_per_sec.id'), primary_key=True),
+)
+Card_targets = db.Table('card_targets',
+    db.Column('card_id', db.Integer, db.ForeignKey('Card.id'), primary_key=True),
+    db.Column('target_id', db.Integer, db.ForeignKey('Targets.id'), primary_key=True))
 
 
 class Cards(db.Model):
@@ -9,8 +21,6 @@ class Cards(db.Model):
     description = db.Column(db.Text())
     rarity = db.Column(db.Integer, db.ForeignKey("Rarity.id"))
     rarity_type = db.relationship("Rarity", backref="Rarity")
-    targets = db.Column(db.Integer, db.ForeignKey("Targets.id"))
-    target = db.relationship("Targets", backref="Targets")
     Min_trophies_unlocked = db.Column(db.Integer, db.ForeignKey("Min_trophies_unlocked.id"))
     Trophies = db.relationship("Trophies", backref="Trophies")
     evolution = db.Column(db.Integer, db.ForeignKey("Evolution.id"))
@@ -21,12 +31,40 @@ class Cards(db.Model):
     spawn_time = db.Column(db.Text())
     elixir = db.Column(db.Text())
     image = db.Column(db.Text())
+    card_health = db.relationship('Health', secondary=Card_stats, backref=db.backref
+                                  ('Card', lazy='dynamic'))
+    card_level = db.relationship('Level', secondary=Card_stats, backref=db.backref
+                                  ('Card', lazy='dynamic'))
+    card_damage = db.relationship('Damage', secondary=Card_stats, backref=db.backref
+                                  ('Card', lazy='dynamic'))
+    card_damage_per_sec = db.relationship('Damage_per_sec', secondary=Card_stats, backref=db.backref
+                                  ('Card', lazy='dynamic'))
+    card_target = db.relationship('Targets', secondary=Card_targets, backref=db.backref
+                                  ('Card', lazy='dynamic'))
 
+class Damage_per_sec(db.Model):
+    __tablename__ = 'Damage_per_sec'
+    id = db.Column(db.Integer, primary_key=True)
+    damage_per_sec = db.Column(db.Text())
+
+class Damage(db.Model):
+    __tablename__ = 'Damage'
+    id = db.Column(db.Integer, primary_key=True)
+    damage = db.Column(db.Text())
+
+class Health(db.Model):
+    __tablename__ = 'Health'
+    id = db.Column(db.Integer, primary_key=True)
+    health = db.Column(db.Text())
+
+class Level(db.Model):
+    __tablename__ = 'Level'
+    id = db.Column(db.Integer, primary_key=True)
 
 class Special(db.Model):
     __tablename__ = "Special"
     id = db.Column(db.Integer, primary_key=True)
-    special = db.Column(db.Text())
+    name = db.Column(db.Text())
     activation_elixir = db.Column(db.Text())
     description = db.Column(db.Text())
 
@@ -58,13 +96,16 @@ class Trophies(db.Model):
     arena = db.Column(db.Text())
 
 
+
 class User(UserMixin, db.Model):
+    __tablename__ = 'User'
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(150))
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
 
+    def set_password(self, password):
+        self.password = generate_password_hash(password, method='sha256')
 
-class Card_stats(db.Model):
-    __tablename__ = "Card_stats"
-    id = db.Column(db.Integer, primary_key=True)    
+    def check_password(self, password):
+        return check_password_hash(self.password, password)

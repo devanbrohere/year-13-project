@@ -4,7 +4,6 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="style.css">
@@ -19,24 +18,25 @@
       <div class="col-12 text-center align-self-center py-5">
         <div class="section pb-5 pt-5 pt-sm-2 text-center">
           <h6 class="mb-0 pb-3"><span>Log In </span><span>Sign Up</span></h6>
-                <input class="checkbox" type="checkbox" id="reg-log" name="reg-log"/>
-                <label for="reg-log"></label>
+          <input class="checkbox" type="checkbox" id="reg-log" name="reg-log"/>
+          <label for="reg-log"></label>
           <div class="card-3d-wrap mx-auto">
             <div class="card-3d-wrapper">
               <div class="card-front">
                 <div class="center-wrap">
                   <div class="section text-center">
                     <h4 class="mb-4 pb-3">Log In</h4>
-                    <form action="{{ url_for('login') }}" method="POST">
+                    <form action="{{ url_for('login_signup') }}" method="POST">
+                      {{ login_form.hidden_tag() }}
                       <div class="form-group">
-                        <input type="email" class="form-style" name="email" placeholder="Email" required>
+                        {{ login_form.email(class_='form-style', placeholder="Email") }}
                         <i class="input-icon uil uil-at"></i>
                       </div>  
                       <div class="form-group mt-2">
-                        <input type="password" class="form-style" name="password" placeholder="Password" required>
+                        {{ login_form.password(class_='form-style', placeholder="Password") }}
                         <i class="input-icon uil uil-lock-alt"></i>
                       </div>
-                      <button type="submit" class="btn mt-4">Login</button>
+                      {{ login_form.submit(class_='btn mt-4', value="LOGIN") }}
                     </form>
                   </div>
                 </div>
@@ -45,20 +45,25 @@
                 <div class="center-wrap">
                   <div class="section text-center">
                     <h4 class="mb-3 pb-3">Sign Up</h4>
-                    <form action="{{ url_for('signup') }}" method="POST">
+                    <form action="{{ url_for('login_signup') }}" method="POST">
+                      {{ register_form.hidden_tag() }}
                       <div class="form-group">
-                        <input type="text" class="form-style" name="full_name" placeholder="Full Name" required>
+                        {{ register_form.full_name(class_='form-style', placeholder="Full Name") }}
                         <i class="input-icon uil uil-user"></i>
                       </div>  
                       <div class="form-group mt-2">
-                        <input type="email" class="form-style" name="email" placeholder="Email" required>
+                        {{ register_form.email(class_='form-style', placeholder="Email") }}
                         <i class="input-icon uil uil-at"></i>
                       </div>
                       <div class="form-group mt-2">
-                        <input type="password" class="form-style" name="password" placeholder="Password" required>
+                        {{ register_form.password(class_='form-style', placeholder="Password") }}
                         <i class="input-icon uil uil-lock-alt"></i>
                       </div>
-                      <button type="submit" class="btn mt-4">Register</button>
+                      <div class="form-group mt-2">
+                        {{ register_form.confirm(class_='form-style', placeholder="Confirm Password") }}
+                        <i class="input-icon uil uil-lock-alt"></i>
+                      </div>
+                      {{ register_form.submit(class_='btn mt-4', value="REGISTER") }}
                     </form>
                   </div>
                 </div>
