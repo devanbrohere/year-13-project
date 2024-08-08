@@ -1,7 +1,6 @@
 from app import app
 from sqlalchemy.exc import IntegrityError
-from flask import render_template, abort, request, redirect, url_for,flash
-from flask_login import login_user, logout_user, current_user, login_required, LoginManager
+from flask import render_template, abort, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,14 +15,11 @@ app.secret_key = 'correcthorsebatterystaple'
 WTF_CSRF_ENABLED = True
 WTF_CSRF_SECRET_KEY = 'sup3r_secr3t_passw3rd'
 db = SQLAlchemy(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login_signup'
+
 
 import app.models as models
 from app.models import Cards, User
 from app.forms import Add_Card, RegisterForm, LoginForm
-
 
 
 @app.route("/")
@@ -43,17 +39,22 @@ def add_card():
 
     if request.method == "POST":
         if form.validate_on_submit():
+            # Create a new card instance
             new_card = models.Cards()
-            new_card.name=form.name.data,
-            new_card.description=form.description.data,
-            new_card.rarity=form.rarity.data,
-            new_card.card_target=form.target.data,
-            new_card.Min_trophies_unlocked=form.trophies.data,
-            new_card.evolution=form.evolution.data,
-            new_card.speed=form.speed.data,
-            new_card.Special=form.special.data,
-            new_card.spawn_time=form.spawn_time.data,
-            new_card.elixir=form.elixir.data
+            new_card.name = form.name.data
+            new_card.description = form.description.data
+            new_card.rarity = form.rarity.data
+            new_card.Min_trophies_unlocked = form.trophies.data
+            new_card.evolution = form.evolution.data
+            new_card.speed = form.speed.data
+            new_card.Special = form.special.data
+            new_card.spawn_time = form.spawn_time.data
+            new_card.elixir = form.elixir.data
+            
+            # Handle many-to-many relationship for card_target
+            target_ids = form.target.data  # list of selected target ids
+            targets = models.Targets.query.filter(models.Targets.id.in_(target_ids)).all()
+            new_card.card_target = targets  # Associate targets with the card
 
             # Handle file upload
             if form.image.data:
@@ -80,10 +81,11 @@ def add_card():
                 return render_template('add_card.html', form=form, title="Add A Card")
 
         else:
-            flash("Form validation failed. Please correct the errors and try again.")
+            flash("Form validation failed. Please correct the errors and try again.", 'danger')
             return render_template('add_card.html', form=form, title="Add A Card")
 
     return render_template("add_card.html", form=form, title="Add A Card")
+
 
 
 @app.route('/details/<int:ref>')
@@ -92,54 +94,53 @@ def details(ref):
     return render_template("card.html", card=deets, title=deets.name)
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+
 
 @app.route('/login_signup', methods=['GET', 'POST'])
 def login_signup():
-    register_form = RegisterForm()
     login_form = LoginForm()
+    register_form = RegisterForm()
 
     if request.method == 'POST':
-        if 'LOGIN' in request.form:  # Check if the login form was submitted
-            if login_form.validate_on_submit():
-                user = User.query.filter_by(email=login_form.email.data).first()
-                if user and check_password_hash(user.password, login_form.password.data):
-                    login_user(user)
-                    return redirect(url_for('welcome'))
-                else:
-                    flash('Invalid email or password', 'danger')
+        if 'submit' in request.form and request.form['submit'] == 'Login':
+            email = login_form.email.data
+            password = login_form.password.data
+
+            user = User.query.filter_by(email=email).first()
+
+            if user and check_password_hash(user.password, password):
+                session['user_id'] = user.id  # Store user ID in session
+                session['user_name'] = user.full_name  # Optional: store user name
+                flash('Login successful!', 'success')
+                return redirect(url_for('welcome'))
             else:
-                flash('Login form validation failed', 'danger')
+                flash('Invalid email or password', 'danger')
 
-        elif 'REGISTER' in request.form:  # Check if the registration form was submitted
-            if register_form.validate_on_submit():
-                if register_form.password.data == register_form.confirm.data:
-                    hashed_password = generate_password_hash(register_form.password.data, method='sha256')
-                    new_user = User(full_name=register_form.full_name.data, email=register_form.email.data, password=hashed_password)
-                    db.session.add(new_user)
-                    db.session.commit()
-                    flash('Registration successful! Please log in.', 'success')
-                    return redirect(url_for('login_signup'))
-                else:
-                    flash('Passwords do not match', 'danger')
+        elif 'submit' in request.form and request.form['submit'] == 'Register':
+            name = register_form.name.data
+            email = register_form.email.data
+            password = register_form.password.data
+            confirm = register_form.confirm.data
+
+            if password != confirm:
+                flash('Passwords do not match', 'danger')
             else:
-                flash('Registration form validation failed', 'danger')
-                print(f"Form Data: {request.form}")
+                existing_user = User.query.filter_by(email=email).first()
+                if existing_user:
+                    flash('Email already registered', 'danger')
+                else:
+                    hashed_password = generate_password_hash(password, method='sha256')
+                    new_user = User(full_name=name, email=email, password=hashed_password)
+                    try:
+                        db.session.add(new_user)
+                        db.session.commit()
+                        flash('Registration successful! Please log in.', 'success')
+                        return redirect(url_for('login_signup'))
+                    except Exception as e:
+                        db.session.rollback()
+                        flash(f'Error during registration: {str(e)}', 'danger')
 
-    return render_template('login_signup.html', register_form=register_form, login_form=login_form)
-
-@app.route('/welcome')
-@login_required
-def welcome():
-    return f"Welcome, {current_user.full_name}!"
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login_signup'))
+    return render_template('login_signup.html', login_form=login_form, register_form=register_form)
 
 @app.route('/cards')
 def cards():
