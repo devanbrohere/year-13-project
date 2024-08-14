@@ -5,11 +5,7 @@
     <p>{{ card.description }}</p>
     <p>Rarity: {{ card.rarity_type.type }}</p>
 
-    <p>health:
-        {% for health in card_health %}
-            {{ health.health }}
-        {% endfor %}
-    </p>
+    
 
     <a href="{{ url_for('cards') }}">Back to all cards</a>
 {% endblock %}

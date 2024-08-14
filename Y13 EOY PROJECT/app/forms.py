@@ -1,35 +1,22 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, TextAreaField, SelectField
 from wtforms import SelectMultipleField, FileField, EmailField, SubmitField, PasswordField, validators
-from flask_wtf.file import FileAllowed
 from wtforms.validators import DataRequired, NumberRange, Length
-from wtforms.validators import Optional, ValidationError, Email, EqualTo
-import app.models
+from wtforms.validators import ValidationError, Email, EqualTo
 from app.models import Rarity, Targets, Trophies, Evolution, Special
-from wtforms.validators import DataRequired, Email, EqualTo
 
-class RegisterForm(FlaskForm):
-    email = EmailField('Email', validators=[Email(message='Please enter a valid email.')])
-    password = PasswordField('Password', [
-        DataRequired(message='Password is required.'),
-        EqualTo('confirm', message='Passwords must match.'),
-        Length(min=6, max=10, message='Password must be between 6 and 10 characters long.')
-    ])
-    confirm = PasswordField('Confirm Password', validators=[
-        DataRequired(message='Password confirmation is required.')
-    ])
-    name = StringField('Name', validators=[
-        DataRequired(message='Name is required.'),
-        Length(min=6, max=12, message='Name must be between 6 and 12 characters long.')
-    ])
+
+class New_user(FlaskForm):
+    full_name = StringField('Name', validators=[DataRequired(), Length(min=2, max=100)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
+
 class LoginForm(FlaskForm):
-    email = EmailField('Email', validators=[Email(message='Please enter a valid email.')])
-    password = PasswordField('Password', validators=[
-        DataRequired(message='Password is required.'),
-        Length(min=6, max=10, message='Password must be between 6 and 10 characters long.')
-    ])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
 
