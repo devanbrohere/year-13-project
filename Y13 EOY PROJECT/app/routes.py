@@ -48,8 +48,7 @@ def cards():
 def card(id):
     card = models.Cards.query.filter_by(id=id).first()
     
-    return render_template('card.html', card=card
-                           )
+    return render_template('card.html', card=card)
 
 
 @app.route("/add_card", methods=['GET', 'POST'])
@@ -128,7 +127,7 @@ def login():
             if user and user.check_password(login_form.password.data):
                 print("check password")
                 session['user_id'] = user.id
-                flash(f'Welcome Back, {user.name}!', 'success')
+                flash(f'Welcome Back, {user.full_name}!', 'success')
                 return redirect(url_for('welcome'))  # Assuming you want to redirect after a successful login
             else:
                 print("wrong password")
@@ -140,38 +139,37 @@ def login():
 def signup():
     register_form = New_user()
     login_form = LoginForm()
+
     if request.method == 'GET':
         print("get")
         return render_template('login_signup.html', login_form=login_form, register_form=register_form)
-    else:
-        if register_form.validate_on_submit():
-            print('validate register')
-            new_user = models.User()
-            new_user.full_name = register_form.full_name.data
-            new_user.email = register_form.email.data
-            new_user.set_password(register_form.password.data)
-            
-            try:
-                print('add')
-                db.session.add(new_user)
-                db.session.commit()
-                flash('Registration successful!', 'success')
-                return redirect(url_for('login'))
-            except IntegrityError:
-                print('Integrity error')
-                db.session.rollback()
-                flash('Email already registered. Please log in.', 'danger')
-                return redirect(url_for('login'))
-            except Exception as e:
-                print(f"An error occurred: {e}")
-                db.session.rollback()
-                flash('An error occurred during registration.', 'danger')
-                return render_template('login_signup.html', register_form=register_form)
-        else:
-            print('form not validated')
-            print(register_form.errors)  # Print form errors to debug
-        return render_template('login_signup.html', register_form=register_form)
 
+    # Handle POST request
+    if register_form.validate_on_submit():
+        print('validate register')
+        new_user = models.User()
+        new_user.full_name = register_form.full_name.data
+        new_user.email = register_form.email.data
+        new_user.set_password(register_form.password.data)
+        
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Registration successful!', 'success')
+            return redirect(url_for('login'))
+        except IntegrityError:
+            db.session.rollback()
+            flash('Email already registered. Please log in.', 'danger')
+            return redirect(url_for('login'))
+
+    # Handle case where form is not validated
+    flash('Passwords entered might be incorrect. Please check!', 'danger')
+    return render_template('login_signup.html', login_form=login_form, register_form=register_form)
+
+
+@app.route("/welcome")
+def welcome():
+    return render_template('welcome.html')
 
 
 if __name__ == "__main__":  # type:ignore
