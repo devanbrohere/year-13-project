@@ -3,7 +3,12 @@
 {% block content %}
     <h1>{{ card.name }}</h1>
     <p>{{ card.description }}</p>
+    {% if card %}
     <p>Rarity: {{ card.rarity_type.type }}</p>
+{% else %}
+    
+{% endif %}
+   
 
     
 

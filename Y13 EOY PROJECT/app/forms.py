@@ -37,18 +37,18 @@ class Add_Card(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(Add_Card, self).__init__(*args, **kwargs)
         self.rarity.choices = [(rarity.id, rarity.type) for rarity in Rarity.query.all()]
-        self.target.choices = [(target.id, target.type) for target in Targets.query.all()]  # Choices for multiple targets
+        self.target.choices = [(target.id, target.target) for target in Targets.query.all()]  # Choices for multiple targets
         self.trophies.choices = [(trophy.id, trophy.trophies) for trophy in Trophies.query.all()]
         self.special.choices = [(special.id, special.name) for special in Special.query.all()]
         self.evolution.choices = [(evolution.id, evolution.cycles) for evolution in Evolution.query.all()]
 
 class Add_Rarity(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
     type = StringField('Type', validators=[DataRequired()])
 
 
 class Add_Target(FlaskForm):
-    type = StringField('type', validators=[DataRequired()])
+    target = StringField('type', validators=[DataRequired()])
+    description = StringField('type', validators=[DataRequired()])
 
 
 class Add_Trophies(FlaskForm):
@@ -66,9 +66,4 @@ class Add_Special(FlaskForm):
     name = StringField('special name', validators=[DataRequired()])
     activation_elexir = IntegerField('Activation elexir', validators=[DataRequired(), NumberRange(min=0)])
     description = StringField('description', validators=[DataRequired()])
-
-
-class add_type(FlaskForm):
-    add_type = SelectField('Add Type', validators=[DataRequired()], coerce=int)
-
 

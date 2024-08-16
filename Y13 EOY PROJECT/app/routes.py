@@ -1,6 +1,6 @@
 from app import app
 from sqlalchemy.exc import IntegrityError
-from flask import render_template, abort, request, redirect, url_for, flash, session
+from flask import render_template, abort, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -18,13 +18,13 @@ db = SQLAlchemy(app)
 
 
 import app.models as models
-from app.models import Cards, User
-from app.forms import Add_Card, New_user, LoginForm
+from app.models import Cards, User, Rarity, Targets
+from app.forms import Add_Card, New_user, LoginForm, Add_Evolution, Add_Rarity, Add_Special, Add_Target, Add_Trophies
 
-
-# @app.errorhandler(404)
-# def page_not_forund(e):
-#     render_template("404.html")
+@app.errorhandler(404)
+def page_not_found(e):
+    # Render a custom 404 error page
+    return render_template('404.html', pagename="error"), 404
 
 
 @app.route("/")
@@ -41,69 +41,119 @@ def about():
 @app.route('/cards')
 def cards():
     cards = models.Cards.query.all()
-    return render_template('cards.html', cards=cards)
+    rarity = Rarity.query.order_by(Rarity.type).all()
+    attack_type = Targets.query.order_by(Targets.target).all()
+    if not cards:
+        flash('No cards available in the database', 'danger')
+        return redirect(url_for('some_other_route'))  # Redirect to a different page, or you can render a specific template
+    return render_template('cards.html', cards=cards, rarity=rarity, attack_type=attack_type)
+
+@app.route("/api/cards", methods=['GET'])
+def filter_cards():
+    rarity_id =  request.args.get('Rarity')
+    target_id = request.args.get('Target')
+    query = models.Cards.query
+    if rarity_id and rarity_id != 'all':
+        query = query.filter(models.Cards.rarity == rarity_id)
+    if target_id and target_id != 'all':
+        query = query.filter(models.Cards.card_target.any(id=target_id))
+    cards = query.all()
+    cards_list = [{'id': card.id, "name":card.name, "image": card.image} for card in cards]
+    return jsonify({"cards": cards_list})
+
 
 
 @app.route('/card/<int:id>')
 def card(id):
     card = models.Cards.query.filter_by(id=id).first()
-    
+    if card is None:
+        flash('Card not in database', 'danger')
+        return redirect(url_for('cards'))  # Redirecting to the list of all cards, or any other page you prefer
     return render_template('card.html', card=card)
 
 
 @app.route("/add_card", methods=['GET', 'POST'])
 def add_card():
-    form = Add_Card()
+    if 'user_id' not in session:
+        flash('Please login', 'danger')
+        return redirect(url_for("home"))
+    else:
+        form = Add_Card()
 
-    if request.method == "POST":
-        if form.validate_on_submit():
-            # Create a new card instance
-            new_card = models.Cards()
-            new_card.name = form.name.data
-            new_card.description = form.description.data
-            new_card.rarity = form.rarity.data
-            new_card.Min_trophies_unlocked = form.trophies.data
-            new_card.evolution = form.evolution.data
-            new_card.speed = form.speed.data
-            new_card.Special = form.special.data
-            new_card.spawn_time = form.spawn_time.data
-            new_card.elixir = form.elixir.data
-            
-            # Handle many-to-many relationship for card_target
-            target_ids = form.target.data  # list of selected target ids
-            targets = models.Targets.query.filter(models.Targets.id.in_(target_ids)).all()
-            new_card.card_target = targets  # Associate targets with the card
+        if request.method == "POST":
+            if form.validate_on_submit():
+                # Create a new card instance
+                new_card = models.Cards()
+                new_card.name = form.name.data
+                new_card.description = form.description.data
+                new_card.rarity = form.rarity.data
+                new_card.Min_trophies_unlocked = form.trophies.data
+                new_card.evolution = form.evolution.data
+                new_card.speed = form.speed.data
+                new_card.Special = form.special.data
+                new_card.spawn_time = form.spawn_time.data
+                new_card.elixir = form.elixir.data
+                
+                # Handle many-to-many relationship for card_target
+                target_ids = form.target.data  # list of selected target ids
+                targets = models.Targets.query.filter(models.Targets.id.in_(target_ids)).all()
+                new_card.card_target = targets  # Associate targets with the card
 
-            # Handle file upload
-            if form.image.data:
-                filename = secure_filename(form.image.data.filename)
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                # Handle file upload
+                if form.image.data:
+                    filename = secure_filename(form.image.data.filename)
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-                # Ensure the upload folder exists
-                if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                    os.makedirs(app.config['UPLOAD_FOLDER'])
+                    # Ensure the upload folder exists
+                    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                        os.makedirs(app.config['UPLOAD_FOLDER'])
 
-                # Save the file
-                form.image.data.save(file_path)
-                new_card.image = f'images/{filename}'
+                    # Save the file
+                    form.image.data.save(file_path)
+                    new_card.image = f'images/{filename}'
+                else:
+                    new_card.image = None
+
+                try:
+                    db.session.add(new_card)
+                    db.session.commit()
+                    return redirect(url_for('details', ref=new_card.id))
+                except IntegrityError:
+                    db.session.rollback()
+                    flash('Card with this name already exists. Please choose a different name.', 'danger')
+                    return render_template('add_card.html', form=form, title="Add A Card")
+
             else:
-                new_card.image = None
-
-            try:
-                db.session.add(new_card)
-                db.session.commit()
-                return redirect(url_for('details', ref=new_card.id))
-            except IntegrityError:
-                db.session.rollback()
-                flash('Card with this name already exists. Please choose a different name.', 'danger')
+                flash("Form validation failed. Please correct the errors and try again.", 'danger')
                 return render_template('add_card.html', form=form, title="Add A Card")
 
-        else:
-            flash("Form validation failed. Please correct the errors and try again.", 'danger')
-            return render_template('add_card.html', form=form, title="Add A Card")
+        return render_template("add_card.html", form=form, title="Add A Card")
 
-    return render_template("add_card.html", form=form, title="Add A Card")
 
+@app.route("/add_rarity", methods=['GET', 'POST'])
+def add_rarity():
+    if 'user_id' not in session:
+            flash('Please login', 'danger')
+            return redirect(url_for("home"))
+    else:
+        rarity_form = Add_Rarity
+        if request.method == 'POST':
+            if rarity_form.validate_on_submit():
+                new_rarity = models.Rarity()
+                new_rarity.rarity= rarity_form.rarity.data
+                
+                try:
+                    db.session.add(new_rarity)
+                    db.session.commit()
+                    return redirect(url_for('details', ref=new_rarity.id))
+                except IntegrityError:
+                    db.session.rollback()
+                    flash('Card with this name already exists. Please choose a different name.', 'danger')
+                    return render_template('add_card.html', rarity_form=rarity_form, title="Add A Card")
+            else:
+                flash("Form validation failed. Please correct the errors and try again.", 'danger')
+                return render_template('add_card.html', rarity_form=rarity_form, title="Add A Card")
+        return render_template("add_card.html", rarity_form=rarity_form, title="Add A Card")
 
 
 @app.route('/details/<int:ref>')
@@ -167,8 +217,19 @@ def signup():
     return render_template('login_signup.html', login_form=login_form, register_form=register_form)
 
 
+@app.route("/logout")
+def logout():
+    if 'user_id' not in session:
+        flash('You are not logged in', 'danger')
+        return redirect(url_for('home'))
+    else:
+        session.pop('user_id', None)
+        session.pop('user_name', None)
+        return redirect(url_for('home'))
+
 @app.route("/welcome")
 def welcome():
+
     return render_template('welcome.html')
 
 

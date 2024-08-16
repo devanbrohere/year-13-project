@@ -54,7 +54,8 @@ class Evolution(db.Model):
 class Targets(db.Model):
     __tablename__ = "Targets"
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.Text())
+    target = db.Column(db.Text())
+    description = db.Column(db.Text())
 
 
 class Trophies(db.Model):

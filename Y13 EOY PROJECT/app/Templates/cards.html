@@ -2,6 +2,27 @@
 
 {% block content %}
     <h1>All Cards</h1>
+
+    <!-- Dropdown for selecting users -->
+    <select id="targetDropdown">
+        <option value="all">All targets</option>
+        {% for target in targets %}
+            <option value="{{ target.id }}">{{ target.target }}</option>
+        {% endfor %}
+    </select>
+    <select id="rarityDropdown">
+        <option value="all">All rarities</option>
+        {% for rarity in rarity %}
+            <option value="{{ rarity.id }}">{{ rarity.type }}</option>
+        {% endfor %}
+    </select>
+    <!-- Button to apply filters -->
+    <button onclick="filterGames()">Apply Filters</button>
+
+    <!-- Placeholder for filtered game list -->
+    <ul id="gameList">
+        <!-- This will be populated with games after filtering -->
+    </ul>
     <div class="horizontal-list-container">
         <ul class="horizontal-list">
             {% for card in cards %}
