@@ -103,7 +103,7 @@ def add_card():
         new_card.card_type = form.card_type.data
         new_card.spawn_time = form.spawn_time.data
         new_card.elixir = form.elixir.data
-        
+
         # Handle many-to-many relationship for card_target
         target_ids = form.target.data
         targets = models.Targets.query.filter(models.Targets.id.in_(target_ids)).all()
@@ -128,6 +128,7 @@ def add_card():
             db.session.rollback()
             flash('Card with this name already exists. Please choose a different name.', 'danger')
 
+    # Handle Card Stats form submission
     if stats_form.validate_on_submit() and 'submit_stats' in request.form:
         # Determine rarity and level range
         rarity = form.rarity.data
@@ -166,6 +167,7 @@ def add_card():
 
         return redirect(url_for('details', ref=new_card.id))
 
+    # Handle Evolution form submission
     if evolution_form.validate_on_submit() and 'submit_evolution' in request.form:
         new_evolution = models.Evolution()
         new_evolution.cycle_for = evolution_form.cycle_for.data

@@ -22,8 +22,6 @@ class Cards(db.Model):
     evo = db.relationship("Evolution", backref="Evolution")  # Relationship to Evolution model
     Special = db.Column(db.Integer, db.ForeignKey("Special.id"))  # Foreign key to Special
     special = db.relationship("Special", backref="Special")  # Relationship to Special model
-    card_type = db.Column(db.Integer, db.ForeignKey("Card_type.id"))
-    card = db.relationship("Card_type", backref="Card_type")
     speed = db.Column(db.Text())  # Speed attribute of the card
     spawn_time = db.Column(db.Text())  # Spawn time attribute of the card
     elixir = db.Column(db.Text())  # Elixir cost of the card
@@ -108,4 +106,3 @@ class Card_stats(db.Model):
     health = db.Column(db.Text())
     damage = db.Column(db.Text())
     damage_per_sec = db.Column(db.Text())
-

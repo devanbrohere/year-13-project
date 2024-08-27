@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, TextAreaField, SelectField
-from wtforms import SelectMultipleField, FileField, EmailField, SubmitField, PasswordField, validators
+from wtforms import SelectMultipleField, FileField, EmailField, SubmitField, PasswordField, validators,DecimalField
 from wtforms.validators import DataRequired, NumberRange, Length
 from wtforms.validators import ValidationError, Email, EqualTo
 from app.models import Rarity, Targets, Trophies, Evolution, Special, Cards, Card_type
@@ -34,6 +34,9 @@ class Add_Card(FlaskForm):
     elixir = IntegerField('Elixir', validators=[DataRequired(), NumberRange(min=1, max=9)])
     description = TextAreaField('Description', validators=[DataRequired()])
     image = FileField('Image', validators=[DataRequired()])
+    health = DecimalField('Health', validators=[DataRequired(), NumberRange(min=0, message="Health must be positive")])
+    damage = DecimalField('Damage', validators=[DataRequired(), NumberRange(min=0, message="Damage must be positive")])
+    damage_sec = DecimalField('Damage per Second', validators=[DataRequired(), NumberRange(min=0, message="Damage per second must be positive")])
 
     def __init__(self, *args, **kwargs):
         super(Add_Card, self).__init__(*args, **kwargs)
