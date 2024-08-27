@@ -1,147 +1,233 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<body>
-    <div class="container">
-        
-        <h1>{{ title }}</h1>
-        <form method="POST" enctype="multipart/form-data">
+<div class="container mt-5">
+    <h1 class="mb-4">{{ title }}</h1>
+
+    <!-- Add Card Form -->
+    <div class="card p-4 mb-4">
+        <h2 class="mb-3">Add a Card</h2>
+        <form id="card-form" method="POST" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
-            
-            <div>
-                {{ form.name.label }}
-                {{ form.name() }}
+
+            <div class="form-group">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control") }}
                 {% if form.name.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.name.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.rarity.label }}
-                {{ form.rarity() }}
+
+            <div class="form-group">
+                {{ form.rarity.label(class="form-label") }}
+                {{ form.rarity(class="form-control") }}
                 {% if form.rarity.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.rarity.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.target.label }}
-                {{ form.target() }}
+
+            <div class="form-group">
+                {{ form.target.label(class="form-label") }}
+                {{ form.target(class="form-control") }}
                 {% if form.target.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.target.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.trophies.label }}
-                {{ form.trophies() }}
+
+            <div class="form-group">
+                {{ form.trophies.label(class="form-label") }}
+                {{ form.trophies(class="form-control") }}
                 {% if form.trophies.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.trophies.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.evolution.label }}
-                {{ form.evolution() }}
+
+            <div class="form-group">
+                {{ form.evolution.label(class="form-label") }}
+                {{ form.evolution(class="form-control") }}
                 {% if form.evolution.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.evolution.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.speed.label }}
-                {{ form.speed() }}
+
+            <div class="form-group">
+                {{ form.speed.label(class="form-label") }}
+                {{ form.speed(class="form-control") }}
                 {% if form.speed.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.speed.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.spawn_time.label }}
-                {{ form.spawn_time() }}
+            <div class="form-group">
+                {{ form.card_type.label(class="form-label") }}
+                {{ form.card_type(class="form-control") }}
+                {% if form.card_type.errors %}
+                    <ul class="text-danger">
+                        {% for error in form.card_type.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.spawn_time.label(class="form-label") }}
+                {{ form.spawn_time(class="form-control") }}
                 {% if form.spawn_time.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.spawn_time.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.elixir.label }}
-                {{ form.elixir() }}
+
+            <div class="form-group">
+                {{ form.elixir.label(class="form-label") }}
+                {{ form.elixir(class="form-control") }}
                 {% if form.elixir.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.elixir.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.description.label }}
-                {{ form.description() }}
+
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control") }}
                 {% if form.description.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.description.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.image.label }}
-                {{ form.image() }}
+
+            <div class="form-group">
+                {{ form.image.label(class="form-label") }}
+                {{ form.image(class="form-control") }}
                 {% if form.image.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.image.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <div>
-                {{ form.special.label }}
-                {{ form.special() }}
+
+            <div class="form-group">
+                {{ form.special.label(class="form-label") }}
+                {{ form.special(class="form-control") }}
                 {% if form.special.errors %}
-                    <ul>
+                    <ul class="text-danger">
                         {% for error in form.special.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
-            
-            <button type="submit" class="btn btn-primary">Add Card</button>
+
+            <button type="submit" name="submit_card" class="btn btn-primary">Add Card</button>
         </form>
     </div>
-</body>
+
+    <!-- Add Evolution Form -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Add a New Evolution</h2>
+        </div>
+        <div class="card-body">
+            <form id="evolution-form" method="POST">
+                {{ evolution_form.hidden_tag() }}
+    
+                <div class="form-group">
+                    {{ evolution_form.cycle_for.label(class="form-label") }}
+                    {{ evolution_form.cycle_for(class="form-control") }}
+                    {% if evolution_form.cycle_for.errors %}
+                        <ul class="text-danger">
+                            {% for error in evolution_form.cycle_for.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+    
+                <div class="form-group">
+                    {{ evolution_form.cycles.label(class="form-label") }}
+                    {{ evolution_form.cycles(class="form-control") }}
+                    {% if evolution_form.cycles.errors %}
+                        <ul class="text-danger">
+                            {% for error in evolution_form.cycles.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+    
+                <div class="form-group">
+                    {{ evolution_form.stat_boost.label(class="form-label") }}
+                    {{ evolution_form.stat_boost(class="form-control") }}
+                    {% if evolution_form.stat_boost.errors %}
+                        <ul class="text-danger">
+                            {% for error in evolution_form.stat_boost.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+    
+                <div class="form-group">
+                    {{ evolution_form.special_ability.label(class="form-label") }}
+                    {{ evolution_form.special_ability(class="form-control") }}
+                    {% if evolution_form.special_ability.errors %}
+                        <ul class="text-danger">
+                            {% for error in evolution_form.special_ability.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ evolution_form.image_evo.label(class="form-label") }}
+                    {{ evolution_form.image_evo(class="form-control") }}
+                    {% if evolution_form.image_evo.errors %}
+                        <ul class="text-danger">
+                            {% for error in evolution_form.image_evo.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+
+            <button type="submit" name="submit_evolution" class="btn btn-primary">Add Evolution</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

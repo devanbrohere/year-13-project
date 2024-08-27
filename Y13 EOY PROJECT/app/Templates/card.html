@@ -1,16 +1,68 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>{{ card.name }}</h1>
-    <p>{{ card.description }}</p>
-    {% if card %}
-    <p>Rarity: {{ card.rarity_type.type }}</p>
-{% else %}
-    
-{% endif %}
-   
+<div class="container mt-4">
+    <h1 class="display-4">{{ card.name }}</h1>
 
-    
+    <!-- Table for card details -->
+    <table class="table mt-3">
+        <tbody>
+            <tr>
+                <th scope="row">Description</th>
+                <td>{{ card.description }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Rarity</th>
+                <td>{{ card.rarity_type.type }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Min Trophies Unlocked</th>
+                <td>{{ card.Min_trophies_unlocked }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Evolution</th>
+                <td>{{ card.evolution }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Speed</th>
+                <td>{{ card.speed }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Special Ability</th>
+                <td>{{ card.Special }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Spawn Time</th>
+                <td>{{ card.spawn_time }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Elixir Cost</th>
+                <td>{{ card.elixir }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Targets</th>
+                <td>
+                    <ul>
+                        {% for target in card.card_target %}
+                            <li>{{ target.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% if card.image %}
+            <tr>
+                <th scope="row">Image</th>
+                <td>
+                    <img src="{{ url_for('static', filename=card.image) }}" alt="{{ card.name }}" class="img-fluid">
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
 
-    <a href="{{ url_for('cards') }}">Back to all cards</a>
+    <!-- Add spacing between the table and the back button -->
+    <div class="mt-4">
+        <a href="{{ url_for('cards') }}" class="btn btn-secondary">Back to All Cards</a>
+    </div>
+</div>
 {% endblock %}
