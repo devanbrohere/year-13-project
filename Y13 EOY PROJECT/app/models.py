@@ -8,7 +8,6 @@ Card_targets = db.Table('card_targets',
                         db.Column('target_id', db.Integer, db.ForeignKey('Targets.id'), primary_key=True))
 
 
-# Cards model representing the card entity in the database
 class Cards(db.Model):
     __tablename__ = "Card"
     id = db.Column(db.Integer, primary_key=True)
@@ -22,12 +21,14 @@ class Cards(db.Model):
     evo = db.relationship("Evolution", backref="Evolution")  # Relationship to Evolution model
     Special = db.Column(db.Integer, db.ForeignKey("Special.id"))  # Foreign key to Special
     special = db.relationship("Special", backref="Special")  # Relationship to Special model
+    card_type = db.Column(db.Integer, db.ForeignKey("Card_type.id"))
+    card = db.relationship("Card_type", backref="Card_type")
     speed = db.Column(db.Text())  # Speed attribute of the card
-    spawn_time = db.Column(db.Text())  # Spawn time attribute of the card
     elixir = db.Column(db.Text())  # Elixir cost of the card
     image = db.Column(db.Text())  # Image URL or path of the card
     card_target = db.relationship('Targets', secondary=Card_targets, backref=db.backref
                                   ('Card', lazy='dynamic'))  # Many-to-many relationship with Targets
+
 
 
 
@@ -58,12 +59,12 @@ class Card_type(db.Model):
 class Evolution(db.Model):
     __tablename__ = "Evolution"
     id = db.Column(db.Integer, primary_key=True)
-    cycles = db.Column(db.String(50), nullable=False)  # Number of cycles for evolution
-    stat_boost = db.Column(db.String(50), nullable=False)  # Stat boost provided by the evolution
-    special_ability = db.Column(db.String(50), nullable=False)  # Special ability gained through evolution
-    cycle_for = db.Column(db.Integer, db.ForeignKey("Cards.id"))
-    cycle = db.relationship("Cards", backref="Cards")
-    image_evo = db.Column(db.Text())  # Image representing the evolution
+    cycles = db.Column(db.Text())
+    stat_boost = db.Column(db.Text())
+    special_ability = db.Column(db.Text())
+    cycle_for = db.Column(db.String(50), nullable=False)
+    stat_boost = db.Column(db.String(50), nullable=False)
+    image_evo = db.Column(db.Text())
 
 
 # Targets model representing the potential targets for a card
@@ -81,6 +82,7 @@ class Trophies(db.Model):
     trophies = db.Column(db.Text())  # Minimum number of trophies required
     arena = db.Column(db.Text())  # Arena associated with the trophies
     image = db.Column(db.Text())
+
 
 # User model representing a user in the system
 class User(db.Model):

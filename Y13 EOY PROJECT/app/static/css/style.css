@@ -58,7 +58,7 @@ body{
 	font-family: 'Poppins', sans-serif;
 	font-weight: 300;
 	line-height: 2;
-	color: #0ea38a;
+	color: #17d7b1;
 	background-color: #0b23f8;
   background-size:cover;
   height: 100vh;
@@ -132,8 +132,8 @@ footer{
   border-radius: 50%;
   transform: rotate(calc(360deg / -8 * var(--i)));
   color: transparent;
-  transition: 1s;
-  transition-delay: 1.5s;
+  transition: .5s;
+  transition-delay: 1s;
 }
 
 .menu.active li a{
@@ -148,7 +148,7 @@ footer{
   border-radius: 2px;
   background: var(--clr);
   transform: rotate(calc(var(--i) * 90deg)) translate(0,25px);
-  transition: height 0.5s, width 0.5s, transform 0.5s;
+  transition: height 0.1s, width 0.1s, transform 0.1s;
   transition-delay: 0s,0s,0s;
 }
 
@@ -506,11 +506,15 @@ display: none;
 }
 
 .image.rare {
-  box-shadow: 0 0 15px 5px #0000FF !important; /* Blue glow */
+  box-shadow: 0 0 15px 5px #b7410e !important; /* Rust glow */
 }
 
 .image.epic {
   box-shadow: 0 0 15px 5px #800080 !important; /* Purple glow */
 }
 
-
+.test {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+  border: none;
+}

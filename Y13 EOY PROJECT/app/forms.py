@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, TextAreaField, SelectField
-from wtforms import SelectMultipleField, FileField, EmailField, SubmitField, PasswordField, validators,DecimalField
+from wtforms import SelectMultipleField, FileField, EmailField, SubmitField, PasswordField, validators, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Length
 from wtforms.validators import ValidationError, Email, EqualTo
 from app.models import Rarity, Targets, Trophies, Evolution, Special, Cards, Card_type
@@ -25,18 +25,14 @@ class Add_Card(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     rarity = SelectField('Rarity', coerce=int, validators=[DataRequired()])
     target = SelectMultipleField('Target', coerce=int, validators=[DataRequired()])  # Changed to SelectMultipleField
-    trophies = SelectField('Trophies', coerce=int, validators=[DataRequired()])
+    trophies = SelectField('Trophies', coerce=int, validators=[DataRequired()], render_kw={"class": ""})
     evolution = SelectField('Evolution', coerce=int, validators=[DataRequired()])
     card_type = SelectField('Card type', coerce=int, validators=[DataRequired()])
     special = SelectField('Special', coerce=int, validators=[DataRequired()])
     speed = TextAreaField('Speed', validators=[DataRequired()])
-    spawn_time = TextAreaField('Spawn Time', validators=[DataRequired()])
     elixir = IntegerField('Elixir', validators=[DataRequired(), NumberRange(min=1, max=9)])
     description = TextAreaField('Description', validators=[DataRequired()])
     image = FileField('Image', validators=[DataRequired()])
-    health = DecimalField('Health', validators=[DataRequired(), NumberRange(min=0, message="Health must be positive")])
-    damage = DecimalField('Damage', validators=[DataRequired(), NumberRange(min=0, message="Damage must be positive")])
-    damage_sec = DecimalField('Damage per Second', validators=[DataRequired(), NumberRange(min=0, message="Damage per second must be positive")])
 
     def __init__(self, *args, **kwargs):
         super(Add_Card, self).__init__(*args, **kwargs)
@@ -81,8 +77,7 @@ class Add_Special(FlaskForm):
     description = StringField('description', validators=[DataRequired()])
 
 class Add_card_stats(FlaskForm):
-    card_id = SelectField('Card', coerce=int, validators=[DataRequired()])
-    health = IntegerField('Health', validators=[DataRequired(), NumberRange(min=0)])
-    level = IntegerField('Level', validators=[DataRequired(), NumberRange(min=1, max=15)])
-    damage = IntegerField('Damage', validators=[DataRequired(), NumberRange(min=1)])
-    damage_sec = IntegerField('Damage Sec', validators=[DataRequired(), NumberRange(min=0)])
+    health = IntegerField('Minimum Health', validators=[DataRequired(), NumberRange(min=10)])
+    damage = IntegerField('Minimum Damage', validators=[DataRequired(), NumberRange(min=0)])
+    damage_sec = IntegerField('Minimum Damage per Second', validators=[DataRequired(), NumberRange(min=0)])
+

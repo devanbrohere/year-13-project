@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 test">
     <h1 class="display-4">{{ card.name }}</h1>
 
     <!-- Table for card details -->
@@ -16,12 +16,12 @@
                 <td>{{ card.rarity_type.type }}</td>
             </tr>
             <tr>
-                <th scope="row">Min Trophies Unlocked</th>
-                <td>{{ card.Min_trophies_unlocked }}</td>
+                <th scope="row">Arena Unlocked</th>
+                <td>{{ card.Min_trophies_unlocked.arena }}</td>
             </tr>
             <tr>
                 <th scope="row">Evolution</th>
-                <td>{{ card.evolution }}</td>
+                <td>{{ card.evo.cycles }} - {{ card.evo.stat_boost }} - {{ card.evo.special_ability }}</td>
             </tr>
             <tr>
                 <th scope="row">Speed</th>
@@ -29,11 +29,7 @@
             </tr>
             <tr>
                 <th scope="row">Special Ability</th>
-                <td>{{ card.Special }}</td>
-            </tr>
-            <tr>
-                <th scope="row">Spawn Time</th>
-                <td>{{ card.spawn_time }}</td>
+                <td>{{ card.special.name }} - {{ card.special.description }}</td>
             </tr>
             <tr>
                 <th scope="row">Elixir Cost</th>
@@ -44,7 +40,7 @@
                 <td>
                     <ul>
                         {% for target in card.card_target %}
-                            <li>{{ target.name }}</li>
+                            <li>{{ target.target }}</li>
                         {% endfor %}
                     </ul>
                 </td>
@@ -59,6 +55,39 @@
             {% endif %}
         </tbody>
     </table>
+
+    <!-- Table for card stats -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h2>Card Stats</h2>
+    </div>
+    <div class="card-body">
+        {% if card_stats and card_stats|length > 0 %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Health</th>
+                    <th>Damage</th>
+                    <th>Damage/sec</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in card_stats %}
+                <tr>
+                    <td>{{ stat.level }}</td>
+                    <td>{{ stat.health }}</td>
+                    <td>{{ stat.damage }}</td>
+                    <td>{{ stat.damage_per_sec }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No stats available for this card.</p>
+        {% endif %}
+    </div>
+</div>
 
     <!-- Add spacing between the table and the back button -->
     <div class="mt-4">
