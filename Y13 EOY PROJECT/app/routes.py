@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 from flask import render_template, abort, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -18,8 +17,8 @@ db = SQLAlchemy(app)
 
 
 import app.models as models
-from app.models import Cards, User, Rarity, Targets, Card_type
-from app.forms import Add_Card, New_user, LoginForm, Add_Evolution, Add_Rarity, Add_Special, Add_Target, Add_Trophies, Add_card_stats
+from app.models import Cards, User, Rarity, Targets, Card_type, Deck
+from app.forms import Add_Card, New_user, LoginForm, Add_Evolution, Add_Special, Add_card_stats
 
 
 def get_starting_level(rarity):
@@ -68,12 +67,15 @@ def about():
 
 @app.route('/card/<int:id>')
 def card(id):
-    card = models.Cards.query.get(id)
-    card_stats = models.Card_stats.query.filter_by(card_id=id).all()
-    print("Card:", card)
-    print("Card Stats:", card_stats)  # Debug output to ensure stats are fetched
-    return render_template('card.html', card=card, card_stats=card_stats)
+    card = models.Cards.query.filter_by(id=id, pending=1).first_or_404()  # Ensure the card has permission 1
 
+    card_stats = models.Card_stats.query.filter_by(card_id=id).all()
+
+    # Debug output to ensure stats are fetched
+    print("Card:", card)
+    print("Card Stats:", card_stats)
+
+    return render_template('card.html', card=card, card_stats=card_stats)
 
 
 @app.route('/cards')
@@ -81,28 +83,116 @@ def cards():
     rarity_id = request.args.get('Rarity')
     target_id = request.args.get('Target')
     card_type_id = request.args.get('CardType')
+    elixir_cost = request.args.get('Elixir')
 
-    query = Cards.query
+    query = Cards.query.filter_by(pending=1)  # Only select cards with permission = 1
 
     if rarity_id and rarity_id != 'all':
-        query = query.filter(Cards.rarity == int(rarity_id))  # Ensure you're filtering by integer
+        query = query.filter(Cards.rarity == int(rarity_id))
 
     if target_id and target_id != 'all':
-        query = query.filter(Cards.card_target.any(id=int(target_id)))  # Ensure you're filtering by integer
+        query = query.filter(Cards.card_target.any(id=int(target_id)))
 
     if card_type_id and card_type_id != 'all':
-        query = query.filter(Cards.card_type == int(card_type_id))  # Ensure you're filtering by integer
+        query = query.filter(Cards.card_type == int(card_type_id))
+
+    if elixir_cost and elixir_cost != 'all':
+        query = query.filter(Cards.elixir == int(elixir_cost))
 
     cards = query.all()
     rarity = Rarity.query.order_by(Rarity.type).all()
     attack_type = Targets.query.order_by(Targets.target).all()
     card_types = Card_type.query.order_by(Card_type.type).all()
+    elixir_costs = sorted({card.elixir for card in Cards.query.all()})  # Get distinct elixir values
 
     if not cards:
         flash('No cards available in the database', 'danger')
         return redirect(url_for('cards'))
 
-    return render_template('cards.html', cards=cards, rarity=rarity, attack_type=attack_type, card_types=card_types)
+    return render_template('cards.html', cards=cards, rarity=rarity, attack_type=attack_type, card_types=card_types, elixir_costs=elixir_costs)
+
+
+@app.route('/deck')
+def deck():
+    # Query all decks
+    decks = Deck.query.all()
+    deck_data = []
+
+    for deck in decks:
+        # Extract card attributes from the deck
+        cards = [
+            deck.card1, deck.card2, deck.card3, deck.card4,
+            deck.card5, deck.card6, deck.card7, deck.card8
+        ]
+        # Calculate average elixir cost
+        total_elixir = 0
+        count = 0
+        for card in cards:
+            if card and card.elixir:
+                try:
+                    elixir_cost = float(card.elixir)
+                    total_elixir += elixir_cost
+                    count += 1
+                except ValueError:
+                    # Handle the case where elixir cost is not a valid number
+                    pass
+        if count > 0:
+            average_elixir = total_elixir / count
+        else:
+            average_elixir = 0
+
+        # Store the deck and its related data
+        deck_data.append({
+            'cards': cards,
+            'average_elixir': average_elixir
+        })
+
+    return render_template('deck.html', deck_data=deck_data)
+
+
+@app.route("/admin")
+def admin():
+    if 'user_id' not in session or session.get('user_id') != 7:
+        flash("Admin access only", 'error')
+        return redirect(url_for('home'))
+    else:
+        pending_cards = models.Cards.query.filter_by(pending=0).all()
+        return render_template("admin.html", pending_cards=pending_cards)
+
+
+@app.route("/admin/approve_card/<int:id>")
+def approve(id):
+    if 'user_id' not in session or session.get('user_id') != 7:
+        flash("Admin access only", 'error')
+        return redirect(url_for('home'))
+    else:
+        pending_card = models.Cards.query.get_or_404(id)
+        # Approve the card
+        pending_card.pending = 1
+        db.session.add(pending_card)
+        db.session.commit()
+        flash("Card and its Evolution (if any) have been approved", "success")
+        return redirect(url_for("admin"))
+
+
+@app.route("/admin/reject_card/<int:id>")
+def reject(id):
+    if 'user_id' not in session or session.get('user_id') != 7:
+        flash("Admin access only", 'error')
+        return redirect(url_for('home'))
+    # Fetch the card to delete
+    card_to_delete = models.Cards.query.get_or_404(id)
+    # Check if the card has an associated evolution
+    if card_to_delete.evo:
+        # Fetch the evolution to delete
+        evolution_to_delete = models.Evolution.query.get(card_to_delete.evolution)
+        if evolution_to_delete:
+            db.session.delete(evolution_to_delete)
+    # Delete the card
+    db.session.delete(card_to_delete)
+    db.session.commit()
+    flash("Card and its Evolution (if any) have been deleted", "success")
+    return redirect(url_for("admin"))
 
 
 @app.route("/add_card", methods=['GET', 'POST'])
@@ -121,11 +211,15 @@ def add_card():
         new_card.description = form.description.data
         new_card.rarity = form.rarity.data
         new_card.Min_trophies_unlocked = form.trophies.data
-        new_card.evolution = form.evolution.data
         new_card.speed = form.speed.data
         new_card.Special = form.special.data
         new_card.card_type = form.card_type.data
         new_card.elixir = form.elixir.data
+
+        if form.evolution.data != 0:  # Check if "None" was selected
+            new_card.evolution = form.evolution.data
+        else:
+            new_card.evolution = None
 
         # Handle many-to-many relationship for card_target
         target_ids = form.target.data
@@ -149,7 +243,10 @@ def add_card():
 
             # Process Card Stats
             starting_level = get_starting_level(new_card.rarity)
-            levels = calculate_levels(starting_level, card_stats_form.health.data, card_stats_form.damage.data, card_stats_form.damage_sec.data)
+            levels = calculate_levels(starting_level,
+                                      card_stats_form.health.data,
+                                      card_stats_form.damage.data,
+                                      card_stats_form.damage_sec.data)
 
             for level_data in levels:
                 card_stat = models.Card_stats()
@@ -159,9 +256,15 @@ def add_card():
                 card_stat.damage = level_data['damage']
                 card_stat.damage_per_sec = level_data['damage_per_sec']
                 db.session.add(card_stat)
-            
             db.session.commit()
-            return redirect(url_for('card', ref=new_card.id))
+            flash("Waiting for admin to accept")
+
+            if 'user_id' not in session or session.get('user_id') != 7:
+                flash("Admin access only", 'error')
+                return redirect(url_for('home'))
+            else:
+                return redirect(url_for('admin'))
+            
         except IntegrityError:
             db.session.rollback()
             flash('Card with this name already exists. Please choose a different name.', 'danger')
@@ -199,7 +302,6 @@ def add_evolution():
         try:
             db.session.add(new_evolution)
             db.session.commit()
-            return redirect(url_for('card', ref=new_evolution.id))
         except IntegrityError:
             db.session.rollback()
             flash('Evolution with this type already exists. Please choose a different type.', 'danger')

@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="decks-container">
+    {% for deck in deck_data %}
+        <div class="deck-container">
+            <!-- Card Slots -->
+            {% for i in range(8) %}
+                {% set card = deck.cards[i] %}
+                <div class="card-slot {% if i == 0 %}active{% endif %}">
+                    {% if card %}
+                        <div class="card-item">
+                            <a href="{{ url_for('card', id=card.id) }}">
+                                <img src="{{ url_for('static', filename=card.image) }}" alt="Card {{ i+1 }}">
+                            </a>
+                            <div class="card-name">{{ card.name }}</div>
+                        </div>
+                    {% else %}
+                        <div class="card-item">
+                            <img src="{{ url_for('static', filename='default_card_image.png') }}" alt="Empty Slot">
+                            <div class="card-name">Empty Slot</div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Elixir Container -->
+        <div class="elixir-container">
+            <img src="{{ url_for('static', filename='elixir.png') }}" alt="Elixir">
+            <div class="elixir-text">{{ deck.average_elixir|round(1) }}</div> <!-- Display average elixir with one decimal place -->
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

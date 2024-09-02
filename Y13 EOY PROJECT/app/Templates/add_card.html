@@ -3,9 +3,17 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4">{{ title }}</h1>
-    
+
+    <!-- Dropdown to select what to add -->
+    <div class="form-group mb-4">
+        <label for="add-selection" class="form-label">What would you like to add?</label>
+        <select id="add-selection" class="form-control">
+            <option value="card_and_stats" selected>Add Card and Stats</option>
+            <option value="evolution">Add Evolution</option>
+        </select>
+    </div>
     <!-- Combined Add Card and Add Card Stats Form -->
-    <div class="card p-4 mb-4">
+    <div id="card-and-stats-form" class="card p-4 mb-4">
         <h2 class="mb-3">Add a Card and Card Stats</h2>
         {% if form and card_stats_form %}
             <form method="POST" enctype="multipart/form-data">
@@ -63,7 +71,12 @@
 
                 <div class="form-group">
                     {{ form.evolution.label(class="form-label") }}
-                    {{ form.evolution(class="form-control") }}
+                    <select class="form-control" id="evolution" name="evolution">
+                        <option value="0" selected>None</option> <!-- Default "None" option -->
+                        {% for evo in form.evolution.choices %}
+                            <option value="{{ evo[0] }}" {% if evo[0] == form.evolution.data %}selected{% endif %}>{{ evo[1] }}</option>
+                        {% endfor %}
+                    </select>
                     {% if form.evolution.errors %}
                         <ul class="text-danger">
                             {% for error in form.evolution.errors %}
@@ -188,9 +201,9 @@
     </div>
 
     <!-- Separate Add Evolution Form -->
-    <div class="card p-4 mb-4">
+    <div id="evolution-form" class="card p-4 mb-4" style="display: none;">
         <h2 class="mb-3">Add a New Evolution</h2>
-        <form id="evolution-form" method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" id="evolution-form-action">
             {{ evolution_form.hidden_tag() }}
 
             <div class="form-group">
@@ -257,4 +270,43 @@
         </form>
     </div>
 </div>
+
+<script>
+    // Get the selected form type from localStorage
+    var selectedFormType = localStorage.getItem('selectedFormType') || 'card_and_stats';
+    var cardAndStatsForm = document.getElementById('card-and-stats-form');
+    var evolutionForm = document.getElementById('evolution-form');
+    var addSelection = document.getElementById('add-selection');
+
+    // Set the dropdown to the selected form type
+    addSelection.value = selectedFormType;
+
+    // Show or hide forms based on the selected form type
+    function toggleForms() {
+        if (selectedFormType === 'card_and_stats') {
+            cardAndStatsForm.style.display = 'block';
+            evolutionForm.style.display = 'none';
+        } else if (selectedFormType === 'evolution') {
+            cardAndStatsForm.style.display = 'none';
+            evolutionForm.style.display = 'block';
+        }
+    }
+
+    // Listen for changes in the dropdown, update the selectedFormType, store it in localStorage, and redirect
+    addSelection.addEventListener('change', function() {
+        selectedFormType = this.value;
+        localStorage.setItem('selectedFormType', selectedFormType);
+
+        if (selectedFormType === 'card_and_stats') {
+            window.location.href = "{{ url_for('add_card') }}";
+        } else if (selectedFormType === 'evolution') {
+            window.location.href = "{{ url_for('add_evolution') }}";
+        }
+    });
+
+    // Initial toggle based on stored value
+    toggleForms();
+</script>
+
+
 {% endblock %}

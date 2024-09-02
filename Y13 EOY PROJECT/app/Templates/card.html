@@ -17,7 +17,7 @@
             </tr>
             <tr>
                 <th scope="row">Arena Unlocked</th>
-                <td>{{ card.Min_trophies_unlocked.arena }}</td>
+                <td>{{ card.trophies.arena }}</td>
             </tr>
             <tr>
                 <th scope="row">Evolution</th>
@@ -56,12 +56,13 @@
         </tbody>
     </table>
 
-    <!-- Table for card stats -->
-<div class="card mt-4">
+<!-- Table for card stats -->
+<div class="container mt-4 test">
     <div class="card-header">
         <h2>Card Stats</h2>
-    </div>
-    <div class="card-body">
+
+    <!-- Table for card details -->
+    <table class="table mt-3">
         {% if card_stats and card_stats|length > 0 %}
         <table class="table">
             <thead>

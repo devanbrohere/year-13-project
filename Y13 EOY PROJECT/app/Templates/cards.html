@@ -2,69 +2,77 @@
 {% block content %}
     <h1>All Cards</h1>
 
-    <!-- Form for filtering cards -->
-    <form method="GET" action="{{ url_for('cards') }}">
-        <!-- Dropdown for selecting targets -->
-        <select id="targetDropdown" name="Target">
-            <option value="all">All targets</option>
-            {% for target in attack_type %}
-                <option value="{{ target.id }}" {% if request.args.get('Target') == target.id|string %}selected{% endif %}>
-                    {{ target.target }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <!-- Dropdown for selecting rarities -->
-        <select id="rarityDropdown" name="Rarity">
-            <option value="all">All rarities</option>
-            {% for rarity in rarity %}
-                <option value="{{ rarity.id }}" {% if request.args.get('Rarity') == rarity.id|string %}selected{% endif %}>
-                    {{ rarity.type }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <!-- Dropdown for selecting card types -->
-        <select id="cardTypeDropdown" name="CardType">
-            <option value="all">All card types</option>
-            {% for card_type in card_types %}
-                <option value="{{ card_type.id }}" {% if request.args.get('CardType') == card_type.id|string %}selected{% endif %}>
-                    {{ card_type.type }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <!-- Submit button to apply filters -->
-        <button type="submit">Apply Filters</button>
-    </form>
-    
-    <!-- Display the filtered card list -->
-    <div class="horizontal-list-container">
-        <table class="card-table">
-            <tr>
-                {% for card in cards %}
-                    {% set rarity_class = '' %}
-                    {% if card.rarity_type.type == 'Common' %}
-                        {% set rarity_class = 'common' %}
-                    {% elif card.rarity_type.type == 'Rare' %}
-                        {% set rarity_class = 'rare' %}
-                    {% elif card.rarity_type.type == 'Epic' %}
-                        {% set rarity_class = 'epic' %}
-                    {% elif card.rarity_type.type == 'Legendary' %}
-                        {% set rarity_class = 'legendary' %}
-                    {% endif %}
-                    <td>
-                        <a href="{{ url_for('card', id=card.id) }}">
-                            <div class="image {{ rarity_class }}">
-                                <img src="{{ url_for('static', filename=card.image) }}" width="100" height="100">
-                            </div>
-                        </a>
-                    </td>
-                    {% if loop.index % 7 == 0 %}
-                        </tr><tr>
-                    {% endif %}
+    <!-- Container for the filter form -->
+    <div class="filter-container">
+        <!-- Form for filtering cards -->
+        <form method="GET" action="{{ url_for('cards') }}">
+            <!-- Dropdown for selecting targets -->
+            <select id="targetDropdown" name="Target">
+                <option value="all">All targets</option>
+                {% for target in attack_type %}
+                    <option value="{{ target.id }}" {% if request.args.get('Target') == target.id|string %}selected{% endif %}>
+                        {{ target.target }}
+                    </option>
                 {% endfor %}
-            </tr>
-        </table>
+            </select>
+    
+            <!-- Dropdown for selecting rarities -->
+            <select id="rarityDropdown" name="Rarity">
+                <option value="all">All rarities</option>
+                {% for rarity in rarity %}
+                    <option value="{{ rarity.id }}" {% if request.args.get('Rarity') == rarity.id|string %}selected{% endif %}>
+                        {{ rarity.type }}
+                    </option>
+                {% endfor %}
+            </select>
+    
+            <!-- Dropdown for selecting card types -->
+            <select id="cardTypeDropdown" name="CardType">
+                <option value="all">All card types</option>
+                {% for card_type in card_types %}
+                    <option value="{{ card_type.id }}" {% if request.args.get('CardType') == card_type.id|string %}selected{% endif %}>
+                        {{ card_type.type }}
+                    </option>
+                {% endfor %}
+            </select>
+    
+            <select id="elixirDropdown" name="Elixir">
+                <option value="all">All elixir costs</option>
+                {% for elixir_cost in elixir_costs %}
+                    <option value="{{ elixir_cost }}" {% if request.args.get('Elixir') == elixir_cost|string %}selected{% endif %}>
+                        {{ elixir_cost }}
+                    </option>
+                {% endfor %}
+            </select>
+    
+            <!-- Submit button to apply filters -->
+            <button type="submit">Apply Filters</button>
+        </form>
+    </div>
+
+    <!-- Container for the card grid -->
+    <div class="card-grid-container">
+        {% for card in cards %}
+            {% set rarity_class = '' %}
+            {% if card.rarity_type.type == 'Common' %}
+                {% set rarity_class = 'common' %}
+            {% elif card.rarity_type.type == 'Rare' %}
+                {% set rarity_class = 'rare' %}
+            {% elif card.rarity_type.type == 'Epic' %}
+                {% set rarity_class = 'epic' %}
+            {% elif card.rarity_type.type == 'Legendary' %}
+                {% set rarity_class = 'legendary' %}
+            {% endif %}
+            <div class="card-item">
+                <a href="{{ url_for('card', id=card.id) }}">
+                    <div class="image-container {{ rarity_class }}">
+                        <img src="{{ url_for('static', filename=card.image) }}" width="90" height="100">
+                        <div class="card-name">{{ card.name }}</div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}
+
+
