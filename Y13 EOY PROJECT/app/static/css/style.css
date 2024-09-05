@@ -34,6 +34,7 @@
 .table {
   width: 100%; /* Ensure table takes full width of its container */
   margin-bottom: 1rem; /* Space below the table */
+  align-items: center;
 }
 
 .card-header h2 {
@@ -76,11 +77,9 @@ body{
   background-size:cover;
   height: 100vh;
   background: radial-gradient(ellipse at bottom, #1B2735 0%, #12141d 100%);
-  display: flex;
   align-items:self-start;
   text-align: center;
-  width: 100%;
-  max-width: 90000000px;
+
 }
 .p{
   font-size: larger;
@@ -114,128 +113,98 @@ body{
 footer{
   margin-top: 100%;
 }
-.menu{
-  position: relative;
-  width: 260px;
-  height: 260px;
+nav {
   display: flex;
-  justify-content: center;
   align-items: center;
-  top:100px
-}
-
-.menu li{
-  position: absolute;
-  left: 0;
-  list-style: none;
-  transform-origin: 130px;
-  transition: 0.5s;
-  transition-delay: calc(0.1s * var(--i));
-  transform: rotate(0deg) translateX(100px);
-}
-
-.menu.active li{
-  transform: rotate(calc(360deg / 8 * var(--i)));
-}
-
-.menu li a{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 60px;
-  height: 60px;
-  font-size: 1.5em;
-  border-radius: 50%;
-  transform: rotate(calc(360deg / -8 * var(--i)));
-  color: transparent;
-  transition: .5s;
-  transition-delay: 1s;
-}
-
-.menu.active li a{
-  color: var(--clr);
-}
-
-.menu li a::before{
-  content: '';
-  position: absolute;
-  width:20px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--clr);
-  transform: rotate(calc(var(--i) * 90deg)) translate(0,25px);
-  transition: height 0.1s, width 0.1s, transform 0.1s;
-  transition-delay: 0s,0s,0s;
-}
-
-.menu.active li a::before{
-  width: 60px;
-  height: 60px;
-  border: 2px solid var(--clr);
-  box-sizing: border-box;
-  background: transparent;
-  transform: rotate(calc(var(--i) * 90deg))translate(0px,0px);
-  transition: transform 0.5s, height 0.5s,  width 0.5s;
-  transition-delay: 1s,1.5s,1.5s;
-  rotate: 135deg;
-}
-
-.menu.active li:hover a::before{
-background: var(--clr);
-box-shadow: 0 0 10px var(--clr),
-0 0 30px var(--clr),
-0 0 50px var(--clr);
-}
-
-.menu li a::after{
-  content: '';
-  position: absolute;
-  left: 50px;
-  width: 20px;
-  height: 2px;
-  background: var(--clr);
-  z-index: -1;
-  transform: rotate(calc(var(--i) * 0deg)) translate(15px,0px);
-  transition: 0.5s;
-  transition-delay: 0.5s;
-}
-
-.menu.active li a::after{
-  left: 10px;
-  width: 40px;
-  transition-delay: 0.5s;
-  transform: rotate(calc(var(--i) * 45deg)) translate(50px,0px);
-
-}
-
-.menu.active li a:hover ion-icon{
+  justify-content: space-between;
+  background-color: #333;
+  padding: 10px 20px;
   position: relative;
-  color: #2f363e;
-  z-index:100000;
 }
 
-.menuToggle{
-  position:relative;
-  width:60px;
-  height: 60px;
-  color: rgb(251, 0, 255);
-  display:flex;
-  justify-content: center;
+.navbar {
+  display: flex;
   align-items: center;
-  z-index: 1000;
-  border-radius: 50%;
+  justify-content: space-between;
+  background-color: #333;
+  padding: 10px 20px;
+}
+
+/* Menu toggle for mobile */
+.menuToggle {
+  display: none;
   cursor: pointer;
-  font-size: 2em;
-  transition: transform 1.5s;
 }
 
-.active .menuToggle{
-  transform: rotate(315deg);
+.menuToggle .hidden {
+  display: none;
 }
 
-a:hover {
-	text-decoration: none;
+/* Navbar links */
+.menu {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
 }
+
+.menu.active {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background-color: #333;
+  padding: 10px 0;
+}
+
+.menu li {
+  margin: 0 10px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+  background-color: #555;
+}
+
+/* Responsive styles for mobile */
+@media (max-width: 768px) {
+  .menuToggle {
+      display: block;
+  }
+
+  .menu {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+  }
+
+  .menu li {
+      margin: 5px 0;
+  }
+
+  .menu.active {
+      display: flex;
+  }
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .nav-menu {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+  }
+}
+
 .link {
   color: #f1770c;
 }
@@ -649,7 +618,10 @@ main {
   display: flex;
   flex-wrap: wrap;
   margin-top: 30px; /* Space between the deck and elixir average */
+  align-items: center;
+  margin: 0 auto; 
 }
+
 
 .card-slot {
   width: 100px;
@@ -673,13 +645,13 @@ main {
 }
 
 .elixir-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
+  display:flex;
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 20px;
   background-color: #06234a;
-  padding: 10px;
-  border-radius: 15px;
+  padding: 9px;
+  border-radius: 10px;
   color: white;
 }
 
@@ -690,4 +662,5 @@ main {
 
 .elixir-text {
   font-size: 20px;
+  text-align: center;
 }

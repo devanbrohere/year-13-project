@@ -67,15 +67,19 @@ def about():
 
 @app.route('/card/<int:id>')
 def card(id):
-    card = models.Cards.query.filter_by(id=id, pending=1).first_or_404()  # Ensure the card has permission 1
+    try:
+        card = models.Cards.query.filter_by(id=id, pending=1).first_or_404()  # Ensure the card has permission 1
 
-    card_stats = models.Card_stats.query.filter_by(card_id=id).all()
+        card_stats = models.Card_stats.query.filter_by(card_id=id).all()
 
-    # Debug output to ensure stats are fetched
-    print("Card:", card)
-    print("Card Stats:", card_stats)
+        # Debug output to ensure stats are fetched
+        print("Card:", card)
+        print("Card Stats:", card_stats)
 
-    return render_template('card.html', card=card, card_stats=card_stats)
+        return render_template('card.html', card=card, card_stats=card_stats)
+    except OverflowError:
+        flash("no card avaiable")
+        return redirect(url_for("cards"))
 
 
 @app.route('/cards')
