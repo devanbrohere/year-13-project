@@ -375,11 +375,11 @@ display: none;
   display: -ms-inline-flexbox;
   display: inline-flex;
   align-items: center;
-  background-color: #f7c41c;
-  color: #000000;
+  background-color: #f7c41c!important;
+  color: #d81f1f!important;
 }
 .btn:hover{  
-  background-color: #000000;
+  background-color: #000000 !important;
   color: #ffeba7;
   box-shadow: 0 8px 24px 0 rgba(16,39,112,.2);
 }
@@ -575,8 +575,115 @@ main {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
+  cursor: pointer;
 }
 
+/* .deck-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.deck-slot {
+  width: 100px;
+  height: 140px;
+  background-color: #3a4f63;
+  border: 2px solid #6fc2d0;
+  border-radius: 10px;
+}
+
+.card-item {
+  width: 110px;
+  height: 150px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.image-container {
+  position: relative;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.card-name {
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+.card-selection {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+} */
+
+.deck-container {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 20px;
+  gap: 15px;
+}
+
+.deck-slot {
+  width: 100px;
+  height: 180px;
+  background-color: #f0f0f0;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+
+.deck-slot.filled {
+  border-color: #000;
+}
+
+/* Container for the card grid */
+.card-grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.card-item {
+  width: 110px;
+  height: 150px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.image-container {
+  position: relative;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.card-name {
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+}
+
+
+
+/* Shake effect for full deck */
+.continuous-shake {
+  animation: shake 0.5s infinite;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
 .card h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;

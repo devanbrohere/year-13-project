@@ -137,6 +137,13 @@ class Deck(db.Model):
 
     card8_id = db.Column(db.Integer, db.ForeignKey("Card.id"))
     card8 = db.relationship("Cards", foreign_keys=[card8_id], backref="card8_deck")
+
     user_id = db.Column(db.Integer, db.ForeignKey("User.id"))
-    user = db.relationship("User", backref="decks",
-                           primaryjoin="User.id == Deck.user_id")
+    user = db.relationship("User", backref="decks", primaryjoin="User.id == Deck.user_id")
+
+    # Method to return a sorted list of card IDs for comparison
+    def sorted_card_ids(self):
+        return sorted([
+            self.card1_id, self.card2_id, self.card3_id, self.card4_id,
+            self.card5_id, self.card6_id, self.card7_id, self.card8_id
+        ])

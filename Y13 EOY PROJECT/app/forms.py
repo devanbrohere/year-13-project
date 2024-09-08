@@ -3,7 +3,7 @@ from wtforms import IntegerField, StringField, TextAreaField, SelectField
 from wtforms import SelectMultipleField, FileField, SubmitField, PasswordField, validators,  HiddenField
 from wtforms.validators import DataRequired, NumberRange, Length
 from wtforms.validators import Email, EqualTo
-from app.models import Rarity, Targets, Trophies, Evolution, Special, Cards, Card_type
+from app.models import Rarity, Targets, Trophies, Evolution, Special, Cards, Card_type,User
 
 
 class New_user(FlaskForm):
@@ -54,7 +54,7 @@ class Add_Evolution(FlaskForm):
 
 class Add_Special(FlaskForm):
     name = StringField('special name', validators=[DataRequired()])
-    activation_elexir = IntegerField('Activation elexir', validators=[DataRequired(), NumberRange(min=0)])
+    activation_elixir = IntegerField('Activation elexir', validators=[DataRequired(), NumberRange(min=0, max=4)])
     description = StringField('description', validators=[DataRequired()])
 
 
@@ -68,4 +68,29 @@ class PendingApprovalForm(FlaskForm):
     card_id = HiddenField("Card ID")
     approve = SubmitField("Approve")
     reject = SubmitField("Reject")
+
+class AddDeckForm(FlaskForm):
+    card1_id = SelectField('Card 1', coerce=int, validators=[DataRequired()])
+    card2_id = SelectField('Card 2', coerce=int, validators=[DataRequired()])
+    card3_id = SelectField('Card 3', coerce=int, validators=[DataRequired()])
+    card4_id = SelectField('Card 4', coerce=int, validators=[DataRequired()])
+    card5_id = SelectField('Card 5', coerce=int, validators=[DataRequired()])
+    card6_id = SelectField('Card 6', coerce=int, validators=[DataRequired()])
+    card7_id = SelectField('Card 7', coerce=int, validators=[DataRequired()])
+    card8_id = SelectField('Card 8', coerce=int, validators=[DataRequired()])
+    
+    submit = SubmitField('Add Deck')
+
+    # Dynamically populate the choices from the database in the view function
+    def populate_choices(self):
+        # Fetch all cards from the database
+        cards = [(card.id, card.name) for card in Cards.query.all()]
+        self.card1_id.choices = cards
+        self.card2_id.choices = cards
+        self.card3_id.choices = cards
+        self.card4_id.choices = cards
+        self.card5_id.choices = cards
+        self.card6_id.choices = cards
+        self.card7_id.choices = cards
+        self.card8_id.choices = cards
 

@@ -1,7 +1,8 @@
 from app import app
 from sqlalchemy.exc import IntegrityError
-from flask import render_template, abort, request, redirect, url_for, flash, session
+from flask import render_template, abort, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 import os
 
@@ -14,11 +15,19 @@ app.secret_key = 'correcthorsebatterystaple'
 WTF_CSRF_ENABLED = True
 WTF_CSRF_SECRET_KEY = 'sup3r_secr3t_passw3rd'
 db = SQLAlchemy(app)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = '20220@burnside.school.nz'
+app.config['MAIL_PASSWORD'] = 'moho4237'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 
+mail = Mail(app)
 
 import app.models as models
 from app.models import Cards, User, Rarity, Targets, Card_type, Deck
-from app.forms import Add_Card, New_user, LoginForm, Add_Evolution, Add_Special, Add_card_stats
+from app.forms import Add_Card, New_user, LoginForm, Add_Evolution
+from app.forms import Add_Special, Add_card_stats, AddDeckForm
 
 
 def get_starting_level(rarity):
@@ -113,7 +122,9 @@ def cards():
         flash('No cards available in the database', 'danger')
         return redirect(url_for('cards'))
 
-    return render_template('cards.html', cards=cards, rarity=rarity, attack_type=attack_type, card_types=card_types, elixir_costs=elixir_costs)
+    return render_template('cards.html', cards=cards, rarity=rarity,
+                           attack_type=attack_type, card_types=card_types,
+                           elixir_costs=elixir_costs)
 
 
 @app.route('/deck')
@@ -192,6 +203,10 @@ def reject(id):
         evolution_to_delete = models.Evolution.query.get(card_to_delete.evolution)
         if evolution_to_delete:
             db.session.delete(evolution_to_delete)
+    if card_to_delete.special:
+        special_to_delete = models.Special.query.get(card_to_delete.special)
+        if special_to_delete:
+            db.session.delete(special_to_delete)
     # Delete the card
     db.session.delete(card_to_delete)
     db.session.commit()
@@ -208,6 +223,7 @@ def add_card():
     form = Add_Card()
     evolution_form = Add_Evolution()
     card_stats_form = Add_card_stats()
+    special_form = Add_Special()
 
     if form.validate_on_submit() and card_stats_form.validate_on_submit() and 'submit_card_and_stats' in request.form:
         new_card = models.Cards()
@@ -216,9 +232,13 @@ def add_card():
         new_card.rarity = form.rarity.data
         new_card.Min_trophies_unlocked = form.trophies.data
         new_card.speed = form.speed.data
-        new_card.Special = form.special.data
         new_card.card_type = form.card_type.data
         new_card.elixir = form.elixir.data
+
+        if form.special.data != 0:  # Check if "None" was selected
+            new_card.Special = form.special.data
+        else:
+            new_card.Special = None
 
         if form.evolution.data != 0:  # Check if "None" was selected
             new_card.evolution = form.evolution.data
@@ -273,7 +293,35 @@ def add_card():
             db.session.rollback()
             flash('Card with this name already exists. Please choose a different name.', 'danger')
 
-    return render_template('add_card.html', form=form, evolution_form=evolution_form, card_stats_form=card_stats_form, title="Add Card")
+    return render_template('add_card.html', form=form, evolution_form=evolution_form,
+                           card_stats_form=card_stats_form, special_form=special_form,
+                           title="Add Card")
+
+
+@app.route('/add_special', methods=['GET','POST'])
+def add_special():
+    if 'user_id' not in session:
+        flash('Please login', 'danger')
+        return redirect(url_for("home"))
+    evolution_form = Add_Evolution()
+    form = Add_Card()
+    special_form = Add_Special()
+
+    if 'submit_special' in request.form and special_form.validate_on_submit():
+        new_special = models.Special()
+        new_special.name = special_form.name.data
+        new_special.activation_elixir = special_form.elixir.data
+        new_special.description = special_form.description.data
+        try:
+            db.session.add(new_special)
+            db.session.commit()
+            flash("Special ablity added")
+        except IntegrityError:
+            db.session.rollback()
+            flash("Special ability already in the database")
+    return render_template("add_card.html", form=form, evolution_form=evolution_form,
+                           special_form=special_form,
+                           title="Add Special")
 
 
 @app.route("/add_evolution", methods=['GET', 'POST'])
@@ -284,6 +332,7 @@ def add_evolution():
 
     evolution_form = Add_Evolution()
     form = Add_Card()
+    special_form = Add_Special()
 
     if 'submit_evolution' in request.form and evolution_form.validate_on_submit():
         new_evolution = models.Evolution()
@@ -306,11 +355,43 @@ def add_evolution():
         try:
             db.session.add(new_evolution)
             db.session.commit()
+            flash("Evolution added")
         except IntegrityError:
             db.session.rollback()
             flash('Evolution with this type already exists. Please choose a different type.', 'danger')
 
-    return render_template('add_card.html', evolution_form=evolution_form, form=form, title="Add Evolution")
+    return render_template('add_card.html', evolution_form=evolution_form,
+                           special_form=special_form, form=form, title="Add Evolution")
+
+
+@app.route('/add_deck', methods=['GET', 'POST'])
+@app.route('/add_deck', methods=['POST'])
+def add_deck():
+    if 'user_id' not in session:
+        flash("You need to be logged in to add a deck.", "danger")
+        return redirect(url_for('login_signup'))
+
+    # Ensure we have valid card data from the form submission
+    deck_cards = []
+    for i in range(1, 9):  # 8 card slots
+        card_id = request.form.get(f'card{i}_id')
+        if card_id:
+            card = Cards.query.get(card_id)
+            if card:
+                deck_cards.append(card)
+
+    if len(deck_cards) == 0:
+        flash("You must select at least one card for the deck.", "danger")
+        return redirect(url_for('create_deck'))  # Replace with the correct route name
+
+    # Add deck to the database
+    new_deck = Deck(user_id=session['user_id'], cards=deck_cards)
+    db.session.add(new_deck)
+    db.session.commit()
+
+    flash("Deck created successfully!", "success")
+    return redirect(url_for('deck'))  # Redirect to deck view or another page
+
 
 
 @app.route('/login', methods=['GET', 'POST'])

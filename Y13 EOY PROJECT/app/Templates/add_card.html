@@ -10,8 +10,10 @@
         <select id="add-selection" class="form-control">
             <option value="card_and_stats" selected>Add Card and Stats</option>
             <option value="evolution">Add Evolution</option>
+            <option value="special">Add Special for champions</option>
         </select>
     </div>
+
     <!-- Combined Add Card and Add Card Stats Form -->
     <div id="card-and-stats-form" class="card p-4 mb-4">
         <h2 class="mb-3">Add a Card and Card Stats</h2>
@@ -148,7 +150,12 @@
 
                 <div class="form-group">
                     {{ form.special.label(class="form-label") }}
-                    {{ form.special(class="form-control") }}
+                    <select class="form-control" id="special" name="special">
+                        <option value="0" selected>None</option> <!-- Default "None" option -->
+                        {% for special_choice in form.special.choices %}
+                            <option value="{{ special_choice[0] }}" {% if special_choice[0] == form.special.data %}selected{% endif %}>{{ special_choice[1] }}</option>
+                        {% endfor %}
+                    </select>
                     {% if form.special.errors %}
                         <ul class="text-danger">
                             {% for error in form.special.errors %}
@@ -269,44 +276,77 @@
             <button type="submit" name="submit_evolution" class="btn btn-primary">Add Evolution</button>
         </form>
     </div>
+
+    <!-- Add Special Form -->
+    <div id="special-form" class="card p-4 mb-4" style="display: none;">
+        <h2 class="mb-3">Add a Special for Champions</h2>
+        <form method="POST" enctype="multipart/form-data" id="special-form-action">
+            {{ special_form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ special_form.name.label(class="form-label") }}
+                {{ special_form.name(class="form-control") }}
+                {% if special_form.name.errors %}
+                    <ul class="text-danger">
+                        {% for error in special_form.name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ special_form.activation_elixir.label(class="form-label") }}
+                {{ special_form.activation_elixir(class="form-control") }}
+                {% if special_form.activation_elixir.errors %}
+                    <ul class="text-danger">
+                        {% for error in special_form.activation_elixir.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ special_form.description.label(class="form-label") }}
+                {{ special_form.description(class="form-control") }}
+                {% if special_form.description.errors %}
+                    <ul class="text-danger">
+                        {% for error in special_form.description.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" name="submit_special" class="btn btn-primary">Add Special</button>
+        </form>
+    </div>
 </div>
 
 <script>
-    // Get the selected form type from localStorage
-    var selectedFormType = localStorage.getItem('selectedFormType') || 'card_and_stats';
-    var cardAndStatsForm = document.getElementById('card-and-stats-form');
-    var evolutionForm = document.getElementById('evolution-form');
-    var addSelection = document.getElementById('add-selection');
+    // JavaScript to toggle between forms
+    const addSelection = document.getElementById('add-selection');
+    const cardAndStatsForm = document.getElementById('card-and-stats-form');
+    const evolutionForm = document.getElementById('evolution-form');
+    const specialForm = document.getElementById('special-form');
 
-    // Set the dropdown to the selected form type
-    addSelection.value = selectedFormType;
+    addSelection.addEventListener('change', function() {
+        const selectedFormType = addSelection.value;
 
-    // Show or hide forms based on the selected form type
-    function toggleForms() {
         if (selectedFormType === 'card_and_stats') {
             cardAndStatsForm.style.display = 'block';
             evolutionForm.style.display = 'none';
+            specialForm.style.display = 'none';
         } else if (selectedFormType === 'evolution') {
             cardAndStatsForm.style.display = 'none';
             evolutionForm.style.display = 'block';
-        }
-    }
-
-    // Listen for changes in the dropdown, update the selectedFormType, store it in localStorage, and redirect
-    addSelection.addEventListener('change', function() {
-        selectedFormType = this.value;
-        localStorage.setItem('selectedFormType', selectedFormType);
-
-        if (selectedFormType === 'card_and_stats') {
-            window.location.href = "{{ url_for('add_card') }}";
-        } else if (selectedFormType === 'evolution') {
-            window.location.href = "{{ url_for('add_evolution') }}";
+            specialForm.style.display = 'none';
+        } else if (selectedFormType === 'special') {
+            cardAndStatsForm.style.display = 'none';
+            evolutionForm.style.display = 'none';
+            specialForm.style.display = 'block';
         }
     });
-
-    // Initial toggle based on stored value
-    toggleForms();
 </script>
-
-
 {% endblock %}
