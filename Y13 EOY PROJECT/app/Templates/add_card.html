@@ -210,7 +210,7 @@
     <!-- Separate Add Evolution Form -->
     <div id="evolution-form" class="card p-4 mb-4" style="display: none;">
         <h2 class="mb-3">Add a New Evolution</h2>
-        <form method="POST" enctype="multipart/form-data" id="evolution-form-action">
+        <form method="POST" enctype="multipart/form-data">
             {{ evolution_form.hidden_tag() }}
 
             <div class="form-group">
@@ -271,16 +271,15 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-            </div>
-
+                </div>
             <button type="submit" name="submit_evolution" class="btn btn-primary">Add Evolution</button>
         </form>
     </div>
 
-    <!-- Add Special Form -->
+    <!-- Separate Add Special Form -->
     <div id="special-form" class="card p-4 mb-4" style="display: none;">
-        <h2 class="mb-3">Add a Special for Champions</h2>
-        <form method="POST" enctype="multipart/form-data" id="special-form-action">
+        <h2 class="mb-3">Add Special for Champions</h2>
+        <form method="POST" enctype="multipart/form-data">
             {{ special_form.hidden_tag() }}
 
             <div class="form-group">
@@ -289,18 +288,6 @@
                 {% if special_form.name.errors %}
                     <ul class="text-danger">
                         {% for error in special_form.name.errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
-
-            <div class="form-group">
-                {{ special_form.activation_elixir.label(class="form-label") }}
-                {{ special_form.activation_elixir(class="form-control") }}
-                {% if special_form.activation_elixir.errors %}
-                    <ul class="text-danger">
-                        {% for error in special_form.activation_elixir.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
@@ -319,34 +306,68 @@
                 {% endif %}
             </div>
 
+            <div class="form-group">
+                {{ special_form.activation_elixir.label(class="form-label") }}
+                {{ special_form.activation_elixir(class="form-control") }}
+                {% if special_form.activation_elixir.errors %}
+                    <ul class="text-danger">
+                        {% for error in special_form.activation_elixir.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
             <button type="submit" name="submit_special" class="btn btn-primary">Add Special</button>
         </form>
     </div>
 </div>
 
 <script>
-    // JavaScript to toggle between forms
-    const addSelection = document.getElementById('add-selection');
-    const cardAndStatsForm = document.getElementById('card-and-stats-form');
-    const evolutionForm = document.getElementById('evolution-form');
-    const specialForm = document.getElementById('special-form');
+    // Get the selected form type from localStorage
+    var selectedFormType = localStorage.getItem('selectedFormType') || 'card_and_stats';
+    var cardAndStatsForm = document.getElementById('card-and-stats-form');
+    var evolutionForm = document.getElementById('evolution-form');
+    var specialForm = document.getElementById("special-form");
+    var addSelection = document.getElementById('add-selection');
 
-    addSelection.addEventListener('change', function() {
-        const selectedFormType = addSelection.value;
+    // Set the dropdown to the selected form type
+    addSelection.value = selectedFormType;
 
+    // Show or hide forms based on the selected form type
+    function toggleForms() {
         if (selectedFormType === 'card_and_stats') {
             cardAndStatsForm.style.display = 'block';
             evolutionForm.style.display = 'none';
-            specialForm.style.display = 'none';
+            specialForm.style.display = 'none'
+
         } else if (selectedFormType === 'evolution') {
             cardAndStatsForm.style.display = 'none';
             evolutionForm.style.display = 'block';
             specialForm.style.display = 'none';
-        } else if (selectedFormType === 'special') {
+
+        }   else if (selectedFormType === 'special') {
             cardAndStatsForm.style.display = 'none';
             evolutionForm.style.display = 'none';
             specialForm.style.display = 'block';
         }
-    });
+    }
+
+    addSelection.addEventListener('change', function() {
+    selectedFormType = this.value;
+    localStorage.setItem('selectedFormType', selectedFormType);
+
+    if (selectedFormType === 'card_and_stats') {
+        window.location.href = "{{ url_for('add_card') }}";
+    } else if (selectedFormType === 'evolution') {
+        window.location.href = "{{ url_for('add_evolution') }}";
+    } else if (selectedFormType === 'special') {
+        window.location.href = "{{ url_for('add_special') }}";
+    }
+});
+
+    // Initial toggle based on stored value
+    toggleForms();
 </script>
-{% endblock %}
+
+{%endblock%}

@@ -218,7 +218,7 @@ def reject(id):
 def add_card():
     if 'user_id' not in session:
         flash('Please login', 'danger')
-        return redirect(url_for("home"))
+        return redirect(url_for("login"))
 
     form = Add_Card()
     evolution_form = Add_Evolution()
@@ -302,7 +302,7 @@ def add_card():
 def add_special():
     if 'user_id' not in session:
         flash('Please login', 'danger')
-        return redirect(url_for("home"))
+        return redirect(url_for("login"))
     evolution_form = Add_Evolution()
     form = Add_Card()
     special_form = Add_Special()
@@ -328,7 +328,7 @@ def add_special():
 def add_evolution():
     if 'user_id' not in session:
         flash('Please login', 'danger')
-        return redirect(url_for("home"))
+        return redirect(url_for("login"))
 
     evolution_form = Add_Evolution()
     form = Add_Card()
@@ -365,33 +365,55 @@ def add_evolution():
 
 
 @app.route('/add_deck', methods=['GET', 'POST'])
-@app.route('/add_deck', methods=['POST'])
 def add_deck():
+    # Check if user is logged in
     if 'user_id' not in session:
         flash("You need to be logged in to add a deck.", "danger")
-        return redirect(url_for('login_signup'))
+        return redirect(url_for('login'))
 
-    # Ensure we have valid card data from the form submission
-    deck_cards = []
-    for i in range(1, 9):  # 8 card slots
-        card_id = request.form.get(f'card{i}_id')
-        if card_id:
-            card = Cards.query.get(card_id)
-            if card:
-                deck_cards.append(card)
+    # Handle POST request for form submission
+    if request.method == 'POST':
+        deck_cards = []
+        for i in range(1, 9):  # 8 card slots
+            card_id = request.form.get(f'card{i}_id')
+            if card_id:
+                card = Cards.query.get(card_id)
+                if card:
+                    deck_cards.append(card)
 
-    if len(deck_cards) == 0:
-        flash("You must select at least one card for the deck.", "danger")
-        return redirect(url_for('create_deck'))  # Replace with the correct route name
+        # Ensure at least 8 cards are selected
+        if len(deck_cards) < 8:
+            flash("You must select 8 cards for the deck.", "danger")
+            return redirect(url_for('add_deck'))
+        
+        # Check if the first card has an evolution and use its image
+        card1 = deck_cards[0] if len(deck_cards) > 0 else None
+        if card1 and card1.evolution:
+            evolution_image = card1.evo.image_evo
+            flash(f"Using evolution image: {evolution_image}", "info")
+            # You can now use `evolution_image` in your template or store it
 
-    # Add deck to the database
-    new_deck = Deck(user_id=session['user_id'], cards=deck_cards)
-    db.session.add(new_deck)
-    db.session.commit()
+        # Add the new deck to the database
+        new_deck = models.Deck()
+        new_deck.user_id = session['user_id']
+        new_deck.card1_id = deck_cards[0].id
+        new_deck.card2_id = deck_cards[1].id
+        new_deck.card3_id = deck_cards[2].id
+        new_deck.card4_id = deck_cards[3].id
+        new_deck.card5_id = deck_cards[4].id
+        new_deck.card6_id = deck_cards[5].id
+        new_deck.card7_id = deck_cards[6].id
+        new_deck.card8_id = deck_cards[7].id
+        db.session.add(new_deck)
+        db.session.commit()
 
-    flash("Deck created successfully!", "success")
-    return redirect(url_for('deck'))  # Redirect to deck view or another page
+        flash("Deck created successfully!", "success")
+        return redirect(url_for('deck'))  # Redirect to deck listing page or appropriate route
 
+    # Handle GET request to show the form
+    cards = Cards.query.all()  # Fetch available cards to display in the form
+    form = AddDeckForm()
+    return render_template('add_deck.html', form=form, cards=cards)
 
 
 @app.route('/login', methods=['GET', 'POST'])
