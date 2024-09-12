@@ -1,9 +1,11 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, TextAreaField, SelectField
-from wtforms import SelectMultipleField, FileField, SubmitField, PasswordField, validators,  HiddenField
+from wtforms import SelectMultipleField, FileField
+from wtforms import SubmitField, PasswordField, validators,  HiddenField
 from wtforms.validators import DataRequired, NumberRange, Length
 from wtforms.validators import Email, EqualTo
-from app.models import Rarity, Targets, Trophies, Evolution, Special, Cards, Card_type,User
+from app.models import Rarity, Targets, Trophies
+from app.models import Evolution, Special, Cards, Card_type
 
 
 class New_user(FlaskForm):
@@ -23,11 +25,11 @@ class LoginForm(FlaskForm):
 class Add_Card(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     rarity = SelectField('Rarity', coerce=int, validators=[DataRequired()])
-    target = SelectMultipleField('Target', coerce=int, validators=[DataRequired()])  # Changed to SelectMultipleField
-    trophies = SelectField('Trophies', coerce=int, validators=[DataRequired()], render_kw={"class": ""})
-    evolution = SelectField('Evolution', coerce=int, validators=[])
+    target = SelectMultipleField('Target', coerce=int, validators=[DataRequired()])
+    trophies = SelectField('Trophies', coerce=int, validators=[DataRequired()])
+    evolution = SelectField('Evolution', coerce=int)
     card_type = SelectField('Card type', coerce=int, validators=[DataRequired()])
-    special = SelectField('Special', coerce=int, validators=[DataRequired()])
+    special = SelectField('Special', coerce=int)
     speed = TextAreaField('Speed', validators=[DataRequired()])
     elixir = IntegerField('Elixir', validators=[DataRequired(), NumberRange(min=1, max=9)])
     description = TextAreaField('Description', validators=[DataRequired()])
@@ -36,9 +38,9 @@ class Add_Card(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(Add_Card, self).__init__(*args, **kwargs)
         self.rarity.choices = [(rarity.id, rarity.type) for rarity in Rarity.query.all()]
-        self.target.choices = [(target.id, target.target) for target in Targets.query.all()]  # Choices for multiple targets
+        self.target.choices = [(target.id, target.target) for target in Targets.query.all()]
         self.trophies.choices = [(trophy.id, trophy.arena) for trophy in Trophies.query.all()]
-        self.special.choices = [(special.id, special.name) for special in Special.query.all()]
+        self.special.choices = [(0, 'None')] + [(special.id, special.name) for special in Special.query.all()]
         self.card_type.choices = [(card_type.id, card_type.type) for card_type in Card_type.query.all()]
         self.evolution.choices = [(0, 'None')] + [(evolution.id, evolution.cycle_for) for evolution in Evolution.query.all()]
 
@@ -51,10 +53,9 @@ class Add_Evolution(FlaskForm):
     image_evo = FileField('Image', validators=[DataRequired()])
 
 
-
 class Add_Special(FlaskForm):
     name = StringField('special name', validators=[DataRequired()])
-    activation_elixir = IntegerField('Activation elexir', validators=[DataRequired(), NumberRange(min=0, max=4)])
+    activation_elixir = IntegerField('Activation elixir', validators=[DataRequired(), NumberRange(min=0, max=4)])
     description = StringField('description', validators=[DataRequired()])
 
 
@@ -69,6 +70,7 @@ class PendingApprovalForm(FlaskForm):
     approve = SubmitField("Approve")
     reject = SubmitField("Reject")
 
+
 class AddDeckForm(FlaskForm):
     card1_id = SelectField('Card 1', coerce=int, validators=[DataRequired()])
     card2_id = SelectField('Card 2', coerce=int, validators=[DataRequired()])
@@ -78,7 +80,7 @@ class AddDeckForm(FlaskForm):
     card6_id = SelectField('Card 6', coerce=int, validators=[DataRequired()])
     card7_id = SelectField('Card 7', coerce=int, validators=[DataRequired()])
     card8_id = SelectField('Card 8', coerce=int, validators=[DataRequired()])
-    
+
     submit = SubmitField('Add Deck')
 
     # Dynamically populate the choices from the database in the view function

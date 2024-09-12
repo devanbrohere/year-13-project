@@ -1,8 +1,7 @@
 from app import app
 from sqlalchemy.exc import IntegrityError
-from flask import render_template, abort, request, redirect, url_for, flash, session, jsonify
+from flask import render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 import os
 
@@ -15,14 +14,7 @@ app.secret_key = 'correcthorsebatterystaple'
 WTF_CSRF_ENABLED = True
 WTF_CSRF_SECRET_KEY = 'sup3r_secr3t_passw3rd'
 db = SQLAlchemy(app)
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = '20220@burnside.school.nz'
-app.config['MAIL_PASSWORD'] = 'moho4237'
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
 
-mail = Mail(app)
 
 import app.models as models
 from app.models import Cards, User, Rarity, Targets, Card_type, Deck
@@ -129,8 +121,18 @@ def cards():
 
 @app.route('/deck')
 def deck():
-    # Query all decks
-    decks = Deck.query.all()
+    user_id = request.args.get('User')  # Get the 'User' query parameter
+
+    # Base query for decks
+    query = Deck.query.join(User)
+
+    # Filter by user if provided
+    if user_id and user_id != 'all':
+        query = query.filter(Deck.user_id == int(user_id))
+
+    # Execute the query to fetch decks
+    decks = query.all()
+
     deck_data = []
 
     for deck in decks:
@@ -149,20 +151,21 @@ def deck():
                     total_elixir += elixir_cost
                     count += 1
                 except ValueError:
-                    # Handle the case where elixir cost is not a valid number
                     pass
-        if count > 0:
-            average_elixir = total_elixir / count
-        else:
-            average_elixir = 0
+        average_elixir = total_elixir / count if count > 0 else 0
 
-        # Store the deck and its related data
+        # Store the deck and its related data, including the user
         deck_data.append({
             'cards': cards,
-            'average_elixir': average_elixir
+            'average_elixir': average_elixir,
+            'user': deck.user  # Assuming a relationship deck.user exists
         })
 
-    return render_template('deck.html', deck_data=deck_data)
+    # Fetch all users for the dropdown
+    users = User.query.order_by(User.full_name).all()
+
+    return render_template('deck.html', deck_data=deck_data,
+                           users=users, selected_user=user_id)
 
 
 @app.route("/admin")
@@ -195,21 +198,28 @@ def reject(id):
     if 'user_id' not in session or session.get('user_id') != 7:
         flash("Admin access only", 'error')
         return redirect(url_for('home'))
+
     # Fetch the card to delete
     card_to_delete = models.Cards.query.get_or_404(id)
+
     # Check if the card has an associated evolution
-    if card_to_delete.evo:
+    if card_to_delete.evolution:
         # Fetch the evolution to delete
         evolution_to_delete = models.Evolution.query.get(card_to_delete.evolution)
         if evolution_to_delete:
             db.session.delete(evolution_to_delete)
+
     if card_to_delete.special:
-        special_to_delete = models.Special.query.get(card_to_delete.special)
+        # Ensure card_to_delete.special is an integer ID
+        special_id = card_to_delete.special if isinstance(card_to_delete.special, int) else card_to_delete.special.id
+        special_to_delete = models.Special.query.get(special_id)
         if special_to_delete:
             db.session.delete(special_to_delete)
+
     # Delete the card
     db.session.delete(card_to_delete)
     db.session.commit()
+
     flash("Card and its Evolution (if any) have been deleted", "success")
     return redirect(url_for("admin"))
 
@@ -288,7 +298,7 @@ def add_card():
                 return redirect(url_for('home'))
             else:
                 return redirect(url_for('admin'))
-            
+
         except IntegrityError:
             db.session.rollback()
             flash('Card with this name already exists. Please choose a different name.', 'danger')
@@ -298,7 +308,7 @@ def add_card():
                            title="Add Card")
 
 
-@app.route('/add_special', methods=['GET','POST'])
+@app.route('/add_special', methods=['GET', 'POST'])
 def add_special():
     if 'user_id' not in session:
         flash('Please login', 'danger')
@@ -385,7 +395,7 @@ def add_deck():
         if len(deck_cards) < 8:
             flash("You must select 8 cards for the deck.", "danger")
             return redirect(url_for('add_deck'))
-        
+
         # Check if the first card has an evolution and use its image
         card1 = deck_cards[0] if len(deck_cards) > 0 else None
         if card1 and card1.evolution:

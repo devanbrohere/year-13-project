@@ -1,35 +1,58 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="decks-container">
-    {% for deck in deck_data %}
-        <div class="deck-container">
-            <!-- Card Slots -->
-            {% for i in range(8) %}
-                {% set card = deck.cards[i] %}
-                <div class="card-slot {% if i == 0 %}active{% endif %}">
-                    {% if card %}
-                        <div class="card-item">
-                            <a href="{{ url_for('card', id=card.id) }}">
-                                <img src="{{ url_for('static', filename=card.image) }}" alt="Card {{ i+1 }}">
-                            </a>
-                            <div class="card-name">{{ card.name }}</div>
-                        </div>
-                    {% else %}
-                        <div class="card-item">
-                            <img src="{{ url_for('static', filename='default_card_image.png') }}" alt="Empty Slot">
-                            <div class="card-name">Empty Slot</div>
-                        </div>
-                    {% endif %}
-                </div>
+<div class="filter-container">
+    <!-- Form for filtering decks by user -->
+    <form method="GET" action="{{ url_for('deck') }}">
+        <!-- Dropdown for selecting users -->
+        <select id="userDropdown" name="User">
+            <option value="all">All users</option>
+            {% for user in users %}
+                <option value="{{ user.id }}" {% if selected_user == user.id|string %}selected{% endif %}>
+                    {{ user.full_name }}
+                </option>
             {% endfor %}
-        </div>
+        </select>
 
-        <!-- Elixir Container -->
-        <div class="elixir-container">
-            <img src='static/images/elixir.png' alt="Elixir">
-            <div class="elixir-text">{{ deck.average_elixir|round(1) }}</div> <!-- Display average elixir with one decimal place -->
-        </div>
-    {% endfor %}
+        <!-- Submit button to apply filters -->
+        <button type="submit">Apply Filters</button>
+    </form>
 </div>
+
+
+    <div class="decks-container">
+        {% for deck in deck_data %}
+            <div class="deck-container">
+                <!-- Card Slots -->
+                {% for i in range(8) %}
+                    {% set card = deck.cards[i] %}
+                    <div class="card-slot {% if i == 0 %}active{% endif %}">
+                        {% if card %}
+                            <div class="card-item">
+                                <a href="{{ url_for('card', id=card.id) }}">
+                                    <img src="{{ url_for('static', filename=card.image) }}" alt="Card {{ i+1 }}">
+                                    
+                                </a>
+                                <p>{{ card.name }}</p>
+                            </div>
+                        {% else %}
+                            <div class="card-item">
+                                <img src="{{ url_for('static', filename='default_card_image.png') }}" alt="Empty Slot">
+                                <div class="card-name">Empty Slot</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>  
+            <!-- Elixir Container -->
+            <div class="elixir-container">
+                <img src="{{ url_for('static', filename='images/elixir.png') }}" alt="Elixir">
+                <div class="elixir-text">{{ deck.average_elixir|round(1) }}</div> <!-- Display average elixir with one decimal place -->
+                <!-- Display the user who added the deck -->
+                <div class="deck-user">
+                    <h3><br>Added by: {{ deck.user.full_name }}</h3> <!-- Adjust attribute as needed -->
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

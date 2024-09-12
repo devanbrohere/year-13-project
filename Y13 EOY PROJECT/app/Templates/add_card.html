@@ -7,7 +7,10 @@
     <!-- Dropdown to select what to add -->
     <div class="form-group mb-4">
         <label for="add-selection" class="form-label">What would you like to add?</label>
-        <select id="add-selection" class="form-control">
+        <select id="add-selection" class="form-control"
+            data-card-url="{{ url_for('add_card') }}"
+            data-evolution-url="{{ url_for('add_evolution') }}"
+            data-special-url="{{ url_for('add_special') }}">
             <option value="card_and_stats" selected>Add Card and Stats</option>
             <option value="evolution">Add Evolution</option>
             <option value="special">Add Special for champions</option>
@@ -74,7 +77,7 @@
                 <div class="form-group">
                     {{ form.evolution.label(class="form-label") }}
                     <select class="form-control" id="evolution" name="evolution">
-                        <option value="0" selected>None</option> <!-- Default "None" option -->
+                         
                         {% for evo in form.evolution.choices %}
                             <option value="{{ evo[0] }}" {% if evo[0] == form.evolution.data %}selected{% endif %}>{{ evo[1] }}</option>
                         {% endfor %}
@@ -151,9 +154,9 @@
                 <div class="form-group">
                     {{ form.special.label(class="form-label") }}
                     <select class="form-control" id="special" name="special">
-                        <option value="0" selected>None</option> <!-- Default "None" option -->
-                        {% for special_choice in form.special.choices %}
-                            <option value="{{ special_choice[0] }}" {% if special_choice[0] == form.special.data %}selected{% endif %}>{{ special_choice[1] }}</option>
+                        <option value="0" {% if not form.special.data %}selected{% endif %}>None</option>
+                        {% for special in form.special.choices %}
+                            <option value="{{ special[0] }}" {% if special[0] == form.special.data %}selected{% endif %}>{{ special[1] }}</option>
                         {% endfor %}
                     </select>
                     {% if form.special.errors %}
@@ -323,51 +326,5 @@
     </div>
 </div>
 
-<script>
-    // Get the selected form type from localStorage
-    var selectedFormType = localStorage.getItem('selectedFormType') || 'card_and_stats';
-    var cardAndStatsForm = document.getElementById('card-and-stats-form');
-    var evolutionForm = document.getElementById('evolution-form');
-    var specialForm = document.getElementById("special-form");
-    var addSelection = document.getElementById('add-selection');
-
-    // Set the dropdown to the selected form type
-    addSelection.value = selectedFormType;
-
-    // Show or hide forms based on the selected form type
-    function toggleForms() {
-        if (selectedFormType === 'card_and_stats') {
-            cardAndStatsForm.style.display = 'block';
-            evolutionForm.style.display = 'none';
-            specialForm.style.display = 'none'
-
-        } else if (selectedFormType === 'evolution') {
-            cardAndStatsForm.style.display = 'none';
-            evolutionForm.style.display = 'block';
-            specialForm.style.display = 'none';
-
-        }   else if (selectedFormType === 'special') {
-            cardAndStatsForm.style.display = 'none';
-            evolutionForm.style.display = 'none';
-            specialForm.style.display = 'block';
-        }
-    }
-
-    addSelection.addEventListener('change', function() {
-    selectedFormType = this.value;
-    localStorage.setItem('selectedFormType', selectedFormType);
-
-    if (selectedFormType === 'card_and_stats') {
-        window.location.href = "{{ url_for('add_card') }}";
-    } else if (selectedFormType === 'evolution') {
-        window.location.href = "{{ url_for('add_evolution') }}";
-    } else if (selectedFormType === 'special') {
-        window.location.href = "{{ url_for('add_special') }}";
-    }
-});
-
-    // Initial toggle based on stored value
-    toggleForms();
-</script>
-
+<script src="{{ url_for('static', filename='js/card.js') }}"></script>
 {%endblock%}
