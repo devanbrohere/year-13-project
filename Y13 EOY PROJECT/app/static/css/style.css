@@ -57,7 +57,13 @@
 .mt-4 {
   margin-top: 1.5rem; /* Adjust spacing as needed */
 }
-
+.mt3{
+  .mt-4 {
+    position: fixed;
+    align-items: end;
+    margin-top: 1.5rem; /* Adjust spacing as needed */
+  }
+}
 
 .flashes {
   list-style-type: none;
@@ -361,6 +367,29 @@ display: none;
   -webkit-transition: all 200ms linear;
    transition: all 200ms linear;
 }
+.btn1 {  
+  border-radius: 4px;
+  height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 200ms linear;
+  padding: 0 30px;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  background-color: #f7c41c!important;
+  color: #d81f1f!important;
+  position: fixed; /* Fixed position to keep it on the left side */
+  left: 20px; /* Position 20px from the left */
+  bottom: 20px; /* Position 20px from the bottom */
+}
+.btn1:hover {  
+  background-color: #000000 !important;
+  color: #ffeba7;
+  box-shadow: 0 8px 24px 0 rgba(16,39,112,.2);
+}
+
 .btn{  
   border-radius: 4px;
   height: 44px;
@@ -447,13 +476,15 @@ display: none;
 }
 
 .filter-container {
-  margin-bottom: 20px; /* Add a gap between the filter and the cards */
+  margin-bottom: 20px;
+  position: relative !important;
+  align-items: center;
 }
 
 .card-grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Adjust size as needed */
-  gap: 30px; /* Adjust spacing between cards */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 30px;
 }
 
 .card-item {
@@ -461,7 +492,7 @@ display: none;
 }
 
 .image-container {
-  position: relative;
+  position: relative !important;
   display: inline-block;
   padding: 2px;
   border-radius: 5px;
@@ -473,8 +504,8 @@ display: none;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-  color: white; /* Text color */
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
   text-align: center;
   padding: 10px;
   opacity: 0;
@@ -512,13 +543,13 @@ display: none;
 }
 
 .card-item:hover {
-  transform: translateY(10px); /* Moves the card down by 10px on hover */
+  transform: translateY(10px);
 }
 
 main {
-  max-width: 1200px; /* Adjust the width as needed */
-  margin: 0 auto; /* Center the element horizontally */
-  padding: 20px; /* Optional: add padding for inner spacing */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 
@@ -528,45 +559,45 @@ main {
   border: none;
 }
 
-.filter-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding: 1rem;
-        background-color: black;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-.filter-container form {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
+.filter-container { 
+  display: flex;
+  justify-content: center; /* Centers the form horizontally */
+  gap: 1rem;
+  padding: 1rem;
+  background-color: black;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0 auto; /* Ensures it's centered in its parent container */
+  max-width: 80%; /* Controls the width of the container */
 }
 
-.filter-container select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    background-color: #fff;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+.filter-container form {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center; /* Centers form elements inside the form */
+}
+
+.filter-container select, .filter-container button {
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fff;
+  border: 1px solid #ccc;
 }
 
 .filter-container button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  background-color: #007bff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .filter-container button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
+
 
 .container {
   max-width: 1200px;
@@ -686,7 +717,7 @@ main {
   border-radius: 20px;
   display: flex;
   flex-wrap: wrap;
-  margin-top: 30px; /* Space between the deck and elixir average */
+  margin-top: 30px;
   align-items: center;
   margin: 0 auto; 
 }
@@ -714,19 +745,24 @@ main {
 }
 
 .elixir-container {
-  display:flex;
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center; 
   text-align: center;
   margin-top: 5px;
   margin-bottom: 40px;
   background-color: #06234a;
   padding: 9px;
-  border-radius: 10px;
+  border-radius: 5%;
   color: white;
+  
 }
 
 .elixir-container img {
   width: 30px;
   height: 30px;
+  margin-bottom: 10px;
 }
 
 .elixir-text {

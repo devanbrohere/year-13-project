@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<h1>All Decks</h1>
 <div class="filter-container">
     <!-- Form for filtering decks by user -->
     <form method="GET" action="{{ url_for('deck') }}">
@@ -15,7 +16,8 @@
         </select>
 
         <!-- Submit button to apply filters -->
-        <button type="submit">Apply Filters</button>
+        <button type="submit">Apply Filters</button><br>
+        <a href="{{ url_for('add_deck') }}" class="btn btn-secondary">Add Battle Decks</a>
     </form>
 </div>
 
@@ -29,7 +31,7 @@
                     <div class="card-slot {% if i == 0 %}active{% endif %}">
                         {% if card %}
                             <div class="card-item">
-                                <a href="{{ url_for('card', id=card.id) }}">
+                                <a href="{{ url_for('show_card', card_id=card.id) }}">
                                     <img src="{{ url_for('static', filename=card.image) }}" alt="Card {{ i+1 }}">
                                     
                                 </a>

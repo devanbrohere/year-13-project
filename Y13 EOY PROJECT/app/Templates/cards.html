@@ -46,8 +46,12 @@
             </select>
     
             <!-- Submit button to apply filters -->
-            <button type="submit">Apply Filters</button>
+            <button type="submit">Apply Filters</button><br>
+            
+            <a href="{{ url_for('add_card') }}" class="btn btn-secondary">Add Cards</a>
+           
         </form>
+        
     </div>
 
     <!-- Container for the card grid -->
@@ -64,7 +68,7 @@
                 {% set rarity_class = 'legendary' %}
             {% endif %}
             <div class="card-item">
-                <a href="{{ url_for('card', id=card.id) }}">
+                <a href="{{ url_for('show_card', card_id=card.id) }}">
                     <div class="image-container {{ rarity_class }}">
                         <img src="{{ url_for('static', filename=card.image) }}" width="90" height="100">
                         <div class="card-name">{{ card.name }}</div>
