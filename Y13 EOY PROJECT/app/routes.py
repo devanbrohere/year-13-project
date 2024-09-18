@@ -71,7 +71,6 @@ def page_not_found(e):
     return render_template('404.html', pagename="error"), 404
 
 
-
 @app.route("/")
 def home():
     """Render the home page"""
@@ -196,7 +195,7 @@ def cards():
 @app.route('/deck')
 def deck():
     """ For user to see all the battle decks """
-    user_id = request.args.get('User')  # Get the 'User' query parameter
+    user_id = request.args.get('User')
 
     # Fetch valid user IDs dynamically
     valid_user_ids = {str(u.id) for u in User.query.all()}
@@ -230,11 +229,21 @@ def deck():
         for card in all_cards:
             if card and card.elixir:
                 try:
+                    # Convert the elixir cost to a float,
+                    # in case it is stored as a string.
                     elixir_cost = float(card.elixir)
+                    # Add the elixir cost to the total elixir sum.
                     total_elixir += elixir_cost
+                    # Increment the count of valid elixir costs for averaging.
                     count += 1
                 except ValueError:
+                    # If the elixir cost cannot be converted to a float
+                    # (invalid data)ignore that card and
+                    # continue with the others.
                     pass
+# Calculate the average elixir cost if there were any valid elixir values.
+# If no valid elixir costs were found,
+# set the average to 0 to avoid division by zero.
         average_elixir = total_elixir / count if count > 0 else 0
 
         # Store the deck and its related data, including the user
@@ -258,7 +267,7 @@ def admin():
     if 'user_id' not in session:
         flash("You must be logged in to access this page.", 'error')
         return redirect(url_for('login'))
-
+# makeing sure that the user logged in is the admin
     user = models.User.query.get(session['user_id'])
     if not user or user.is_admin != 1:
         return redirect(url_for('home'))
@@ -333,7 +342,7 @@ def add_card():
     if 'user_id' not in session:
         flash('You need to be logged in to add a card.', 'danger')
         return redirect(url_for("login"))
-
+# to return the different forms to one page
     form = Add_Card()
     evolution_form = Add_Evolution()
     card_stats_form = Add_card_stats()
@@ -351,12 +360,12 @@ def add_card():
         new_card.card_type = form.card_type.data
         new_card.elixir = form.elixir.data
 
-        if form.special.data != 0:  # Check if "None" was selected
+        if form.special.data != 0:
             new_card.Special = form.special.data
         else:
             new_card.Special = None
 
-        if form.evolution.data != 0:  # Check if "None" was selected
+        if form.evolution.data != 0:
             new_card.evolution = form.evolution.data
         else:
             new_card.evolution = None
@@ -424,6 +433,7 @@ def add_special():
     if 'user_id' not in session:
         flash('Please login', 'danger')
         return redirect(url_for("login"))
+
     evolution_form = Add_Evolution()
     form = Add_Card()
     special_form = Add_Special()
