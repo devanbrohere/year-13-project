@@ -223,7 +223,7 @@ p {
 }
 h4 {
   font-weight: 600;
-  color:rgb(9, 223, 247);
+  color:rgb(252, 255, 255);
 }
 h6 span{
   padding: 0 20px;
@@ -343,12 +343,12 @@ display: none;
   line-height: 22px;
   letter-spacing: 0.5px;
   outline: none;
-  color: #0291ca;
+  color: #000000;
   background-color: #f4f7f8;
   border: none;
   -webkit-transition: all 200ms linear;
   transition: all 200ms linear;
-  box-shadow: 0 4px 8px 0 rgba(98, 21, 251, 0.955);
+  box-shadow: 0 4px 8px 0 rgba(71, 2, 210, 0.955);
 }
 .form-style:focus,
 .form-style:active {
