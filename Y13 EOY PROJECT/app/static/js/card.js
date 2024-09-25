@@ -52,3 +52,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial toggle based on stored value
     toggleForms();
 });
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+    // Function to check file size
+    function checkFileSize(inputId) {
+        const pictureInput = document.getElementById(inputId);
+        pictureInput.addEventListener('change', () => {
+            const pictureFile = pictureInput.files[0];
+
+            if (pictureFile && pictureFile.size > MAX_FILE_SIZE) {
+                alert('File size exceeds 5 MB limit.');
+                pictureInput.value = ''; // Clear the input to allow re-selection
+            }
+        });
+    }
+
+    // Check file sizes for each input
+    checkFileSize('image');
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const checkboxes = document.querySelectorAll("#target-checkboxes input[type='checkbox']");
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", function() {
+                const checkedCount = Array.from(checkboxes).filter(i => i.checked).length;
+                
+                if (checkedCount > 2) {
+                    alert("You can only select up to 2 targets.");
+                    this.checked = false;  // Uncheck the current checkbox
+                }
+            });
+        });
+    });

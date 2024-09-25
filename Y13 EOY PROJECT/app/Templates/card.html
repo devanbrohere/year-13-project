@@ -4,7 +4,7 @@
 {% if card.image %}
 <img src="{{ url_for('static', filename=card.image) }}" alt="{{ card.name }}" class="img-fluid">
 {% endif %}
-<div class="container mt-4 test">
+<div class="container mt-4 bg">
     <h1 class="display-4">{{ card.name }}</h1>
     <h3>{{ card.description }}<br><br></h3>
 
