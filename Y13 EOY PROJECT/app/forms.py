@@ -1,18 +1,11 @@
-"""
-This module defines the forms used in the
-application, including fields for adding
-cards, managing user accounts,
-and handling deck creation in the Clash Royale app.
-It imports necessary fields
-and validators from WTForms and Flask-WTF.
-"""
 from typing import List, Tuple
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, TextAreaField, SelectField
-from wtforms import SelectMultipleField, FileField
+from wtforms import SelectMultipleField, FileField, RadioField
 from wtforms import SubmitField, PasswordField, HiddenField
 from wtforms.validators import DataRequired, NumberRange, Length
 from wtforms.validators import Email, EqualTo
+from flask_wtf.file import FileAllowed
 from app.models import Rarity, Targets, Trophies
 from app.models import Evolution, Special, Cards, Card_type
 
@@ -49,9 +42,10 @@ class Add_Card(FlaskForm):
     special = SelectField('Special', coerce=int)
     speed = TextAreaField('Speed', validators=[DataRequired(), Length(max=45)])
     elixir = IntegerField('Elixir', validators=[DataRequired(),
-                                                NumberRange(min=1, max=9)])
+                                                NumberRange(min=1, max=10)])
     description = TextAreaField('Description', validators=[DataRequired()])
-    image = FileField('Image', validators=[DataRequired()])
+    image =\
+        FileField('Image', validators=[FileAllowed(['jpg', 'png']), DataRequired()])
 
     def __init__(self, *args, **kwargs):
         super(Add_Card, self).__init__(*args, **kwargs)
@@ -86,8 +80,6 @@ class Add_Evolution(FlaskForm):
                                   validators=[DataRequired(), Length(max=45)])
     cycle_for = TextAreaField('Cycles For',
                               validators=[DataRequired(), Length(max=45)])
-    image_evo = FileField('Image',
-                          validators=[DataRequired()])
 
 
 class Add_Special(FlaskForm):
@@ -102,13 +94,13 @@ class Add_Special(FlaskForm):
 class Add_card_stats(FlaskForm):
     health = IntegerField('Minimum Health', validators=[DataRequired(),
                                                         NumberRange(min=10,
-                                                                    max=200)])
+                                                                    max=4000)])
     damage = IntegerField('Minimum Damage', validators=[DataRequired(),
                                                         NumberRange(min=9,
-                                                                    max=200)])
+                                                                    max=400)])
     damage_sec = IntegerField('Minimum Damage per Second',
                               validators=[DataRequired(),
-                                          NumberRange(min=0, max=200)])
+                                          NumberRange(min=0, max=400)])
 
 
 class PendingApprovalForm(FlaskForm):

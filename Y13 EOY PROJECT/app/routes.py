@@ -250,11 +250,16 @@ def deck():
         deck_data.append({
             'cards': all_cards,
             'average_elixir': average_elixir,
-            'user': new_deck.user  # Assuming a relationship deck.user exists
+            'user': new_deck.user
         })
 
-    # Fetch all users for the dropdown
     users = User.query.order_by(User.full_name).all()
+    decks = query.all()
+    print(decks)
+    if not decks:
+        flash('No Deck For User', 'danger')
+        print("works")
+        return redirect(url_for('deck'))
 
     return render_template('deck.html', deck_data=deck_data,
                            users=users, selected_user=user_id)
@@ -407,17 +412,18 @@ def add_card():
                 card_stat.damage_per_sec = level_data['damage_per_sec']
                 db.session.add(card_stat)
             db.session.commit()
-            flash("Waiting for admin to accept")
+            flash("Waiting for admin to accept", "success")
 
             if 'user_id' not in session or session.get('user_id') != 7:
-                flash("Admin access only", 'error')
+                flash("Admin access only", 'danger')
                 return redirect(url_for('home'))
             else:
                 return redirect(url_for('home'))
 
         except IntegrityError:
             db.session.rollback()
-            flash("Card with this name already exists. Please choose a different name.", 'danger')
+            flash("""Card with this name already exists.
+                  Please choose a different name.""", 'danger')
 
     return render_template('add_card.html', form=form,
                            evolution_form=evolution_form,
@@ -433,20 +439,20 @@ def add_special():
     if 'user_id' not in session:
         flash('Please login', 'danger')
         return redirect(url_for("login"))
-
+# to return the different forms to one page
     evolution_form = Add_Evolution()
     form = Add_Card()
     special_form = Add_Special()
 
     if 'submit_special' in request.form and special_form.validate_on_submit():
         new_special = models.Special()
-        new_special.name = special_form.name.data
+        new_special.name = special_form.name.data.capitalize()
         new_special.activation_elixir = special_form.elixir.data
         new_special.description = special_form.description.data
         try:
             db.session.add(new_special)
             db.session.commit()
-            flash("Special ablity added")
+            flash("Special ablity added, go back to add cards")
         except IntegrityError:
             db.session.rollback()
             flash("Special ability already in the database")
@@ -462,7 +468,7 @@ def add_evolution():
     if 'user_id' not in session:
         flash('Please login', 'danger')
         return redirect(url_for("login"))
-
+# to return the different forms to one page
     evolution_form = Add_Evolution()
     form = Add_Card()
     special_form = Add_Special()
@@ -470,21 +476,10 @@ def add_evolution():
     if 'submit_evolution' in request.form and\
             evolution_form.validate_on_submit():
         new_evolution = models.Evolution()
-        new_evolution.cycle_for = evolution_form.cycle_for.data
+        new_evolution.cycle_for = evolution_form.cycle_for.data.capitalize()
         new_evolution.cycles = evolution_form.cycles.data
         new_evolution.stat_boost = evolution_form.stat_boost.data
         new_evolution.special_ability = evolution_form.special_ability.data
-
-        # Handle file upload for evolution
-        if evolution_form.image_evo.data:
-            filename = secure_filename(evolution_form.image_evo.data.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                os.makedirs(app.config['UPLOAD_FOLDER'])
-            evolution_form.image_evo.data.save(file_path)
-            new_evolution.image_evo = f'images/{filename}'
-        else:
-            new_evolution.image_evo = None
 
         try:
             db.session.add(new_evolution)
@@ -492,7 +487,8 @@ def add_evolution():
             flash("Evolution added")
         except IntegrityError:
             db.session.rollback()
-            flash('Evolution with this type already exists. Please choose a different type.', 'danger')
+            flash("""Evolution with this type already exists.
+                  Please choose a different type.""", 'danger')
 
     return render_template('add_card.html', evolution_form=evolution_form,
                            special_form=special_form,
@@ -515,10 +511,14 @@ def add_deck():
                 card = Cards.query.get(card_id)
                 if card:
                     deck_cards.append(card)
+                else:
+                    flash(f"Card with ID {card_id} not found.", "danger")
+                    return redirect(url_for('add_deck'))
 
         # Ensure at least 8 cards are selected
         if len(deck_cards) < 8:
-            flash("You must select 8 cards for the deck.", "danger")
+            flash("Fill out all the card slots before submitting.", "danger")
+            print("works")
             return redirect(url_for('add_deck'))
 
         # Check if the first card has an evolution and use its image
@@ -526,7 +526,6 @@ def add_deck():
         if card1 and card1.evolution:
             evolution_image = card1.evo.image_evo
             flash(f"Using evolution image: {evolution_image}", "info")
-            # You can now use `evolution_image` in your template or store it
 
         # Add the new deck to the database
         new_deck = models.Deck()

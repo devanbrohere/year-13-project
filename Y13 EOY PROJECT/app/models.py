@@ -62,7 +62,6 @@ class Evolution(db.Model):
     special_ability = db.Column(db.Text())
     cycle_for = db.Column(db.Text(), nullable=False)
     stat_boost = db.Column(db.String(50), nullable=False)
-    image_evo = db.Column(db.Text())
 
 
 class Targets(db.Model):
