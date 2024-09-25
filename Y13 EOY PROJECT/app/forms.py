@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, TextAreaField, SelectField
-from wtforms import SelectMultipleField, FileField, RadioField
+from wtforms import SelectMultipleField, FileField
 from wtforms import SubmitField, PasswordField, HiddenField
 from wtforms.validators import DataRequired, NumberRange, Length
 from wtforms.validators import Email, EqualTo

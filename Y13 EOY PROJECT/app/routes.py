@@ -353,6 +353,10 @@ def add_card():
     card_stats_form = Add_card_stats()
     special_form = Add_Special()
 
+    target = models.Targets.query.all()
+    target_list = []
+    for t in target:
+        target_list.append(t.target)
     if form.validate_on_submit() and \
             card_stats_form.validate_on_submit() and \
             'submit_card_and_stats' in request.form:
@@ -412,23 +416,23 @@ def add_card():
                 card_stat.damage_per_sec = level_data['damage_per_sec']
                 db.session.add(card_stat)
             db.session.commit()
-            flash("Waiting for admin to accept", "success")
+            flash("Waiting for admin to accept")
 
             if 'user_id' not in session or session.get('user_id') != 7:
-                flash("Admin access only", 'danger')
+                flash("Admin access only", 'error')
                 return redirect(url_for('home'))
             else:
                 return redirect(url_for('home'))
 
         except IntegrityError:
             db.session.rollback()
-            flash("""Card with this name already exists.
-                  Please choose a different name.""", 'danger')
+            flash("Card with this name already exists. Please choose a different name.", 'danger')
 
     return render_template('add_card.html', form=form,
                            evolution_form=evolution_form,
                            card_stats_form=card_stats_form,
                            special_form=special_form,
+                           target_list=target_list,
                            title="Add Card")
 
 
@@ -487,8 +491,7 @@ def add_evolution():
             flash("Evolution added")
         except IntegrityError:
             db.session.rollback()
-            flash("""Evolution with this type already exists.
-                  Please choose a different type.""", 'danger')
+            flash('Evolution with this type already exists. Please choose a different type.', 'danger')
 
     return render_template('add_card.html', evolution_form=evolution_form,
                            special_form=special_form,
