@@ -16,7 +16,7 @@ class New_user(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email(),
                                              Length(min=10, max=50)])
     password = PasswordField('Password',
-                             validators=[DataRequired(), Length(min=6)])
+                             validators=[DataRequired(), Length(min=6,max=40)])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(),
                                                  EqualTo('password')])
