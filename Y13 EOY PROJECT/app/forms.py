@@ -43,7 +43,7 @@ class Add_Card(FlaskForm):
     speed = TextAreaField('Speed', validators=[DataRequired(), Length(max=45)])
     elixir = IntegerField('Elixir', validators=[DataRequired(),
                                                 NumberRange(min=1, max=10)])
-    description = TextAreaField('Description', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired(), Length(max=90)])
     image =\
         FileField('Image', validators=[FileAllowed(['jpg', 'png']), DataRequired()])
 
@@ -94,13 +94,13 @@ class Add_Special(FlaskForm):
 class Add_card_stats(FlaskForm):
     health = IntegerField('Minimum Health', validators=[DataRequired(),
                                                         NumberRange(min=10,
-                                                                    max=1000)])
+                                                                    max=2000)])
     damage = IntegerField('Minimum Damage', validators=[DataRequired(),
                                                         NumberRange(min=9,
-                                                                    max=100)])
+                                                                    max=2000)])
     damage_sec = IntegerField('Minimum Damage per Second',
                               validators=[DataRequired(),
-                                          NumberRange(min=0, max=1000)])
+                                          NumberRange(min=0, max=2000)])
 
 
 class PendingApprovalForm(FlaskForm):

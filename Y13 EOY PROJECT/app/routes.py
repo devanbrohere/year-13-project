@@ -1,6 +1,7 @@
 import os
 from sqlalchemy.exc import IntegrityError
-from flask import render_template, request, redirect, url_for, flash, session, g
+from flask import render_template, request, redirect, url_for, flash, session
+from flask import g
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from app import app
@@ -390,7 +391,8 @@ def add_card():
                 os.makedirs(app.config['UPLOAD_FOLDER'])
             form.image.data.save(file_path)
             new_card.image = f'images/{filename}'
-            # If no image is uploaded, set the image field of the new_card to None
+            # If no image is uploaded,
+            # set the image field of the new_card to None
         else:
             new_card.image = None
 
@@ -480,7 +482,7 @@ def add_evolution():
         try:
             db.session.add(new_evolution)
             db.session.commit()
-            flash("Evolution added")
+            flash("Evolution added, go back to add cards to add card")
         except IntegrityError:
             db.session.rollback()
             flash("""Evolution with this type already exists.

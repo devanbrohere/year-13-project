@@ -31,6 +31,8 @@
                 {% set rarity_class = 'epic' %}
             {% elif card.rarity_type.type == 'Legendary' %}
                 {% set rarity_class = 'legendary' %}
+            {% elif card.rarity_type.type == 'Champion' %}
+                {% set rarity_class = 'champion' %}
             {% endif %}
             <div class="card-item" id="card-{{ card.id }}" onclick="selectCard('{{ card.id }}', '{{ url_for('static', filename=card.image) }}')">
                 <div class="image-container {{ rarity_class }}">
