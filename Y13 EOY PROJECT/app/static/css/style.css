@@ -560,6 +560,9 @@ display: none;
   box-shadow: 0 0 15px 5px #800080 !important; /* Purple glow */
 }
 
+.image-container.champion {
+  box-shadow: 0 0 15px 5px #FFD700 !important; /* Purple glow */
+}
 .card-item:hover {
   transform: translateY(10px);
 }

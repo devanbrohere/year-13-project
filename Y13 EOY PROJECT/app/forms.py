@@ -94,13 +94,13 @@ class Add_Special(FlaskForm):
 class Add_card_stats(FlaskForm):
     health = IntegerField('Minimum Health', validators=[DataRequired(),
                                                         NumberRange(min=10,
-                                                                    max=4000)])
+                                                                    max=1000)])
     damage = IntegerField('Minimum Damage', validators=[DataRequired(),
                                                         NumberRange(min=9,
-                                                                    max=400)])
+                                                                    max=100)])
     damage_sec = IntegerField('Minimum Damage per Second',
                               validators=[DataRequired(),
-                                          NumberRange(min=0, max=400)])
+                                          NumberRange(min=0, max=1000)])
 
 
 class PendingApprovalForm(FlaskForm):

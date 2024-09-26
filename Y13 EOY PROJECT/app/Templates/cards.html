@@ -66,6 +66,8 @@
                 {% set rarity_class = 'epic' %}
             {% elif card.rarity_type.type == 'Legendary' %}
                 {% set rarity_class = 'legendary' %}
+            {% elif card.rarity_type.type == 'Champion' %}
+                {% set rarity_class = 'champion' %}
             {% endif %}
             <div class="card-item">
                 <a href="{{ url_for('show_card', card_id=card.id) }}">

@@ -443,7 +443,7 @@ def add_special():
     if 'submit_special' in request.form and special_form.validate_on_submit():
         new_special = models.Special()
         new_special.name = special_form.name.data.capitalize()
-        new_special.activation_elixir = special_form.elixir.data
+        new_special.activation_elixir = special_form.activation_elixir.data
         new_special.description = special_form.description.data
         try:
             db.session.add(new_special)
