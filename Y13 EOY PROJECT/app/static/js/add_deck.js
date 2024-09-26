@@ -99,7 +99,6 @@ function replaceCardInSlot(slotIndex) {
     }
 }
 
-
 // Stop shaking animation and show all cards
 function stopShakingDeck() {
     document.querySelector('#cancelShake').style.display = 'none';

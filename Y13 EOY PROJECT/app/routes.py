@@ -550,9 +550,16 @@ def login():
         return render_template('login_signup.html', login_form=login_form,
                                register_form=register_form)
     else:
+        email = login_form.email.data
+        # Check for "@" and "." in the email
+        if "@" not in email or "." not in email.split("@")[-1]:
+            flash('Please enter an email containing "@" and a "." after it.', 'danger')
+            return render_template('login_signup.html', login_form=login_form,
+                                   register_form=register_form)
+
         if login_form.validate_on_submit():
             print('validate login')
-            user = User.query.filter_by(email=login_form.email.data).first()
+            user = User.query.filter_by(email=email).first()
             if user:
                 if user.check_password(login_form.password.data):
                     print("check password")
@@ -565,6 +572,7 @@ def login():
             else:
                 print("email not found")
                 flash('Email not found. Please signup.', 'danger')
+
         return render_template('login_signup.html', login_form=login_form,
                                register_form=register_form)
 
