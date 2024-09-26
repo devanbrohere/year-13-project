@@ -157,7 +157,8 @@ def cards():
         try:
             elixir_value = int(elixir_cost)
             if elixir_value > int(max_elixir_cost):
-                flash(f'Elixir cost is too large, max allowed is {max_elixir_cost}.', 'danger')
+                flash(f"""Elixir cost is too large,
+                      max allowed is {max_elixir_cost}.""", 'danger')
                 return redirect(url_for('cards'))
         except ValueError:
             flash('Invalid elixir cost', 'danger')
@@ -182,7 +183,7 @@ def cards():
     attack_type = Targets.query.order_by(Targets.target).all()
     card_types = Card_type.query.order_by(Card_type.type).all()
     elixir_costs = sorted({card.elixir for card in Cards.query.all()})
-
+    # if there is no card for the specific filter
     if not all_cards:
         flash('No cards available in the database', 'danger')
         return redirect(url_for('cards'))
@@ -353,10 +354,6 @@ def add_card():
     card_stats_form = Add_card_stats()
     special_form = Add_Special()
 
-    target = models.Targets.query.all()
-    target_list = []
-    for t in target:
-        target_list.append(t.target)
     if form.validate_on_submit() and \
             card_stats_form.validate_on_submit() and \
             'submit_card_and_stats' in request.form:
@@ -393,6 +390,7 @@ def add_card():
                 os.makedirs(app.config['UPLOAD_FOLDER'])
             form.image.data.save(file_path)
             new_card.image = f'images/{filename}'
+            # If no image is uploaded, set the image field of the new_card to None
         else:
             new_card.image = None
 
@@ -417,22 +415,16 @@ def add_card():
                 db.session.add(card_stat)
             db.session.commit()
             flash("Waiting for admin to accept")
-
-            if 'user_id' not in session or session.get('user_id') != 7:
-                flash("Admin access only", 'error')
-                return redirect(url_for('home'))
-            else:
-                return redirect(url_for('home'))
-
+            return redirect(url_for('home'))
         except IntegrityError:
             db.session.rollback()
-            flash("Card with this name already exists. Please choose a different name.", 'danger')
+            flash("""Card with this name already exists.
+                  Please choose a different name.""", 'danger')
 
     return render_template('add_card.html', form=form,
                            evolution_form=evolution_form,
                            card_stats_form=card_stats_form,
                            special_form=special_form,
-                           target_list=target_list,
                            title="Add Card")
 
 
@@ -491,7 +483,8 @@ def add_evolution():
             flash("Evolution added")
         except IntegrityError:
             db.session.rollback()
-            flash('Evolution with this type already exists. Please choose a different type.', 'danger')
+            flash("""Evolution with this type already exists.
+                  Please choose a different type.""", 'danger')
 
     return render_template('add_card.html', evolution_form=evolution_form,
                            special_form=special_form,
@@ -508,6 +501,8 @@ def add_deck():
     # Handle POST request for form submission
     if request.method == 'POST':
         deck_cards = []
+
+        # Gather card IDs from the form
         for i in range(1, 9):  # 8 card slots
             card_id = request.form.get(f'card{i}_id')
             if card_id:
@@ -518,29 +513,21 @@ def add_deck():
                     flash(f"Card with ID {card_id} not found.", "danger")
                     return redirect(url_for('add_deck'))
 
+        # Debugging outputs
+        print("Submitted card IDs:", [request.form.get(f'card{i}_id') for i in range(1, 9)])
+        print("Number of valid cards selected:", len(deck_cards))
+
         # Ensure at least 8 cards are selected
         if len(deck_cards) < 8:
-            flash("Fill out all the card slots before submitting.", "danger")
-            print("works")
-            return redirect(url_for('add_deck'))
+            flash("Fill out all the card slots before submitting.", "warning")
+            print("Flash message triggered: not enough cards")
+            return render_template('add_deck.html', cards=Cards.query.all())
 
-        # Check if the first card has an evolution and use its image
-        card1 = deck_cards[0] if len(deck_cards) > 0 else None
-        if card1 and card1.evolution:
-            evolution_image = card1.evo.image_evo
-            flash(f"Using evolution image: {evolution_image}", "info")
+        # If the deck is valid, create the new deck
+        new_deck = models.Deck(user_id=session['user_id'])  # type: ignore
+        for idx, card in enumerate(deck_cards):
+            setattr(new_deck, f'card{idx + 1}_id', card.id)
 
-        # Add the new deck to the database
-        new_deck = models.Deck()
-        new_deck.user_id = session['user_id']
-        new_deck.card1_id = deck_cards[0].id
-        new_deck.card2_id = deck_cards[1].id
-        new_deck.card3_id = deck_cards[2].id
-        new_deck.card4_id = deck_cards[3].id
-        new_deck.card5_id = deck_cards[4].id
-        new_deck.card6_id = deck_cards[5].id
-        new_deck.card7_id = deck_cards[6].id
-        new_deck.card8_id = deck_cards[7].id
         db.session.add(new_deck)
         db.session.commit()
 
